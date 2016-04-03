@@ -11,6 +11,7 @@ class IThermalController
 
         virtual void heat() = 0;
         virtual void cool() = 0;
+        virtual void stay() = 0;
 
 };
 

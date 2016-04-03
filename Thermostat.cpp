@@ -7,6 +7,9 @@
 #include "Interfaces/ISetPointController.h"
 #include "Interfaces/IThermometer.h"
 #include "Interfaces/ITemperatureControlAlgorithm.h"
+#include "Interfaces/IThermalController.h"
+#include "Interfaces/IThermostatDisplay.h"
+
 
 static thermostat::ThermostatComponent* aThermostatPtr;
 
@@ -27,8 +30,14 @@ int main(int argc, char* argv[])
         Module<thermostat::Interfaces::ISetPointController> aSetPoint("./TestSetPointController.so");
         Module<thermostat::Interfaces::IThermometer> aThermometer("./TestThermometer.so");
         Module<thermostat::Interfaces::ITemperatureControlAlgorithm> aAlgorithm("./BangBangController.so");
+        Module<thermostat::Interfaces::IThermalController> aController("./TestThermalController.so");
+        Module<thermostat::Interfaces::IThermostatDisplay> aDisplay("./SimpleLedDisplay.so");
 
-        thermostat::ThermostatComponent aThermostat(aSetPoint.get(), aThermometer.get(), aAlgorithm.get());
+        thermostat::ThermostatComponent aThermostat(aSetPoint.get(),
+                                                    aThermometer.get(),
+                                                    aAlgorithm.get(),
+                                                    aController.get(),
+                                                    aDisplay.get());
         aThermostatPtr = &aThermostat;
 
         aThermostat.run();

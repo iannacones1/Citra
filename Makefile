@@ -1,5 +1,5 @@
 OBJS = Thermostat.o ThermostatComponent.o
-MODS = TestSetPointController.so TestThermometer.so BangBangController.so TestThermalController.so
+MODS = TestSetPointController.so TestThermometer.so BangBangController.so TestThermalController.so SimpleLedDisplay.so
 
 CC=$(HOME)/x-tools/arm-rpi-linux-gnueabi/bin/arm-rpi-linux-gnueabi-g++
 DEBUG = -g
@@ -28,6 +28,9 @@ BangBangController.so: Interfaces/ITemperatureControlAlgorithm.h Modules/BangBan
 
 TestThermalController.so: Interfaces/IThermalController.h Modules/TestThermalController.cpp
 	$(CC) $(MFLAGS) TestThermalController.so Modules/TestThermalController.cpp
+
+SimpleLedDisplay.so: Interfaces/IThermostatDisplay.h Modules/SimpleLedDisplay.cpp
+	$(CC) $(MFLAGS) SimpleLedDisplay.so Modules/SimpleLedDisplay.cpp
 
 all: Thermostat $(MODS)
 

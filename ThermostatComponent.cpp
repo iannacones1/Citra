@@ -4,11 +4,15 @@ namespace thermostat {
 
 ThermostatComponent::ThermostatComponent(Interfaces::ISetPointController* inSetPointController,
                                          Interfaces::IThermometer* inThermometer,
-					 Interfaces::ITemperatureControlAlgorithm* inControlAlgorithm)
+					 Interfaces::ITemperatureControlAlgorithm* inControlAlgorithm,
+                                         Interfaces::IThermalController* inThermalController,
+                                         Interfaces::IThermostatDisplay* inThermostatDisplay)
   : mShutdown(false),
     mSetPointController(inSetPointController),
     mThermometer(inThermometer),
-    mControlAlgorithm(inControlAlgorithm)
+    mControlAlgorithm(inControlAlgorithm),
+    mThermalController(inThermalController),
+    mThermostatDisplay(inThermostatDisplay)
 {
     std::cout << __func__ << std::endl; 
 }
@@ -28,11 +32,15 @@ void ThermostatComponent::run()
 
         std::cout << " Control Temp = " << (control ? "ON" : "OFF") << std::endl;
 
+        float setpoint;
+        float currentTemp;
+	Interfaces::Control action;
+
         if (control)
 	{
-	    float setpoint = mSetPointController->currentSetPointFahrenheit();
-            float currentTemp = mThermometer->currentTemperatureFahrenheit();
-	    Interfaces::Control action = mControlAlgorithm->controlTemperatureFahrenheit(setpoint, currentTemp);
+	    setpoint = mSetPointController->currentSetPointFahrenheit();
+            currentTemp = mThermometer->currentTemperatureFahrenheit();
+	    action = mControlAlgorithm->controlTemperatureFahrenheit(setpoint, currentTemp);
 
 	    std::cout << "Setpoint Temp = " << setpoint << std::endl;
 	    std::cout << " Current Temp = " << currentTemp << std::endl;
@@ -40,13 +48,31 @@ void ThermostatComponent::run()
 
 	    switch (action)
 	    {
-	        case Interfaces::STAY : std::cout << "STAY"; break;
-	        case Interfaces::HEAT : std::cout << "HEAT"; break;
-	        case Interfaces::COOL : std::cout << "COOL"; break;
+	        case Interfaces::STAY :
+		{
+		    mThermalController->stay();
+                    std::cout << "STAY";
+                    break;
+		}
+	        case Interfaces::HEAT :
+                {
+		    mThermalController->heat();
+                    std::cout << "HEAT";
+
+                    break;
+		}
+	        case Interfaces::COOL :
+		{
+		    mThermalController->cool();
+                    std::cout << "COOL";
+                    break;
+		}
 	    }
 
 	    std::cout << std::endl;
 	}
+
+	mThermostatDisplay->display(control, setpoint, currentTemp, action); 
 
         sleep(1);
     }

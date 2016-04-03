@@ -1,14 +1,9 @@
 #ifndef _I_TEMPERATURE_CONTROL_ALGORITHM_H_
 #define _I_TEMPERATURE_CONTROL_ALGORITHM_H_
 
-namespace thermostat { namespace Interfaces {
+#include "ControlEnum.hpp"
 
-enum Control
-{
-  STAY,
-  HEAT,
-  COOL
-};
+namespace thermostat { namespace Interfaces {
 
 class ITemperatureControlAlgorithm
 {

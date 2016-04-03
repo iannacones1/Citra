@@ -11,9 +11,9 @@ class BangBangController : public Interfaces::ITemperatureControlAlgorithm
 
         virtual Interfaces::Control controlTemperatureFahrenheit(float inSetpointFahrenheit, float inTemperature)
         {
+            if (inSetpointFahrenheit == inTemperature) { return Interfaces::STAY; }
             if (inSetpointFahrenheit > inTemperature) { return Interfaces::HEAT; }
 	    if (inSetpointFahrenheit < inTemperature) { return Interfaces::COOL; }
-	    return Interfaces::STAY;
         }
 };
 
