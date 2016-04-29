@@ -1,0 +1,8 @@
+ThermostatComponent SetPointController ./lib/ButtonSetPointController.so
+ThermostatComponent Thermometer        ./lib/DS18B20Thermometer.so
+ThermostatComponent ControlAlgorithm   ./lib/BangBangController.so
+ThermostatComponent ThermalController  ./lib/PowerSwitchTailController.so
+ThermostatComponent ThermostatDisplays ./lib/SimpleLedDisplay.so
+CONFIG ../config/SimpleLedDisplayConfig.txt
+ThermostatComponent ThermostatDisplays ./lib/ControlOutputDisplay.so
+ThermostatComponent ThermostatDisplays ./lib/LcdDisplay.so

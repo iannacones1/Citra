@@ -1,4 +1,4 @@
-#include "../Interfaces/IThermometer.h"
+#include "Interfaces/IThermometer.h"
 #include "create_module_macro.h"
 
 #include <iostream>
@@ -25,21 +25,21 @@ class TestThermometer : public Interfaces::IThermometer
               mQ.push(txt);
 	    }
 	  
-	    if (mQ.size() >= 5)
+	    if (mQ.size() /* >= 5 */)
 	    {
                 txt = mQ.front();
                 mQ.pop();
             
                 if (txt == "heat")
                 { 
-		  cooler = 0;
-		  heater = 1;
-                  mTestTemp += heater;
+  		    cooler = 0;
+  		    heater = 0.1;
+                    mTestTemp += heater;
                 }
 		else if (txt == "cool")
                 { 
 		    heater = 0;
-                    cooler = 1;
+                    cooler = 0.1;
                     mTestTemp -= cooler;
                 }
 		else

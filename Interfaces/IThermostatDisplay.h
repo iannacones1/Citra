@@ -2,6 +2,7 @@
 #define _I_THERMOSTAT_DISPLAY_H_
 
 #include "ControlEnum.hpp"
+#include "Configurable.hpp"
 
 namespace thermostat { namespace Interfaces {
 

@@ -1,19 +1,18 @@
-#include "../Interfaces/IThermostatDisplay.h"
+#include "Interfaces/IThermostatDisplay.h"
 #include "create_module_macro.h"
 
-#include "../GPIO.hpp"
+#include "GPout.hpp"
 
 namespace thermostat {
 
 class SimpleLedDisplay : public Interfaces::IThermostatDisplay
 {
     public:
-        SimpleLedDisplay()
-          : Interfaces::IThermostatDisplay(),
-            mainLed(18),
-            redLed(17),
-            greenLed(27),
-            blueLed(22)
+        SimpleLedDisplay() : Interfaces::IThermostatDisplay(),
+                             mainLed(MainLedPin),
+                             redLed(RedLedPin),
+                             greenLed(GreenLedPin),
+                             blueLed(BlueLedPin)
         {
 	    mainLed.on();
         }
@@ -23,7 +22,7 @@ class SimpleLedDisplay : public Interfaces::IThermostatDisplay
 	    mainLed.off();
         }
 
-        virtual void display(bool inOn, float inSetPoint, float inCurrentTemp, Interfaces::Control inControlAction)
+        virtual void display(bool inOn, float /* inSetPoint */, float /* inCurrentTemp */, Interfaces::Control inControlAction)
         {
             redLed.off();
             greenLed.off();
@@ -40,10 +39,19 @@ class SimpleLedDisplay : public Interfaces::IThermostatDisplay
 	}
 
     protected:
-      GPIO mainLed;
-      GPIO redLed;
-      GPIO greenLed;
-      GPIO blueLed;
+      CONFIGURABLE
+      (
+	(int) MainLedPin,
+	(int) RedLedPin,
+	(int) GreenLedPin,
+	(int) BlueLedPin
+      )
+      INITIALIZE(SimpleLedDisplay);
+
+      GPout mainLed;
+      GPout redLed;
+      GPout greenLed;
+      GPout blueLed;
 
 };
 

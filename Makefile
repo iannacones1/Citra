@@ -1,40 +1,80 @@
-OBJS = Thermostat.o ThermostatComponent.o
-MODS = TestSetPointController.so TestThermometer.so BangBangController.so TestThermalController.so SimpleLedDisplay.so
+BIN_DIR = ./bin/
+LIB_DIR = ./bin/lib/
+OBJ_DIR = ./bin/obj/
 
-CC=$(HOME)/x-tools/arm-rpi-linux-gnueabi/bin/arm-rpi-linux-gnueabi-g++
+CC = g++
+
 DEBUG = -g
-CFLAGS = -Wall -std=c++11 -c $(DEBUG)
+WARN = -Wall
+FLAGS = $(WARN) -std=c++11 -I./ $(DEBUG)
 
-LFLAGS = -Wall $(DEBUG)
-MFLAGS = -shared -o
+CFLAGS = $(FLAGS) -c
+LFLAGS = $(FLAGS)
+MFLAGS = $(FLAGS) -fPIC -shared -o
+
+
+OBJS = $(OBJ_DIR)Configurator.o $(OBJ_DIR)Thermostat.o $(OBJ_DIR)ThermostatComponent.o
+MODS = ButtonSetPointController.so TestThermometer.so BangBangController.so TestThermalController.so SimpleLedDisplay.so
+MODS += DS18B20Thermometer.so ControlOutputDisplay.so LcdDisplay.so
+MODS += PowerSwitchTailController.so
 
 Thermostat: $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) -o Thermostat -ldl
+	mkdir -p $(BIN_DIR)	
+	$(CC) $(LFLAGS) $(OBJS) -o $(BIN_DIR)Thermostat -ldl -rdynamic
 
-Thermostat.o: Thermostat.cpp ThermostatComponent.h
-	$(CC) $(CFLAGS) Thermostat.cpp
+$(OBJ_DIR)Configurator.o: Configurator.cpp Configurator.h
+	mkdir -p $(OBJ_DIR)	
+	$(CC) $(CFLAGS) Configurator.cpp -o $(OBJ_DIR)Configurator.o
 
-ThermostatComponent.o: ThermostatComponent.h ThermostatComponent.cpp
-	$(CC) $(CFLAGS) ThermostatComponent.cpp
+$(OBJ_DIR)Thermostat.o: Thermostat.cpp ThermostatComponent.h
+	$(CC) $(CFLAGS) Thermostat.cpp -o $(OBJ_DIR)Thermostat.o
 
-TestSetPointController.so: Interfaces/ISetPointController.h Modules/TestSetPointController.cpp
-	$(CC) $(MFLAGS) TestSetPointController.so Modules/TestSetPointController.cpp
+$(OBJ_DIR)ThermostatComponent.o: ThermostatComponent.h ThermostatComponent.cpp
+	$(CC) $(CFLAGS) ThermostatComponent.cpp -o $(OBJ_DIR)ThermostatComponent.o
 
-TestThermometer.so: Interfaces/IThermometer.h Modules/TestThermometer.cpp
-	$(CC) $(MFLAGS) TestThermometer.so Modules/TestThermometer.cpp
+ButtonSetPointController.so: Interfaces/ISetPointController.h Modules/ButtonSetPointController.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)ButtonSetPointController.so Modules/ButtonSetPointController.cpp
 
 BangBangController.so: Interfaces/ITemperatureControlAlgorithm.h Modules/BangBangController.cpp
-	$(CC) $(MFLAGS) BangBangController.so Modules/BangBangController.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)BangBangController.so Modules/BangBangController.cpp
 
 TestThermalController.so: Interfaces/IThermalController.h Modules/TestThermalController.cpp
-	$(CC) $(MFLAGS) TestThermalController.so Modules/TestThermalController.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)TestThermalController.so Modules/TestThermalController.cpp
+
+PowerSwitchTailController.so: Interfaces/IThermalController.h Modules/PowerSwitchTailController.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)PowerSwitchTailController.so Modules/PowerSwitchTailController.cpp
 
 SimpleLedDisplay.so: Interfaces/IThermostatDisplay.h Modules/SimpleLedDisplay.cpp
-	$(CC) $(MFLAGS) SimpleLedDisplay.so Modules/SimpleLedDisplay.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)SimpleLedDisplay.so Modules/SimpleLedDisplay.cpp $(OBJ_DIR)Configurator.o
 
-all: Thermostat $(MODS)
+LcdDisplay.so: Interfaces/IThermostatDisplay.h Modules/LcdDisplay.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)LcdDisplay.so Modules/LcdDisplay.cpp $(OBJ_DIR)Configurator.o -lboost_thread 
+
+ControlOutputDisplay.so: Interfaces/IThermostatDisplay.h Modules/ControlOutputDisplay.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)ControlOutputDisplay.so Modules/ControlOutputDisplay.cpp
+
+DS18B20Thermometer.so: Interfaces/IThermometer.h Modules/DS18B20Thermometer.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)DS18B20Thermometer.so Modules/DS18B20Thermometer.cpp -lboost_thread 
+
+TestThermometer.so: Interfaces/IThermometer.h Modules/TestThermometer.cpp
+	mkdir -p $(LIB_DIR)	
+	$(CC) $(MFLAGS) $(LIB_DIR)TestThermometer.so Modules/TestThermometer.cpp
+
+
+all: Thermostat $(OBJS) $(MODS)
 
 clean:
-	rm *.so *.o *~ Thermostat
+	find -name "*~" -exec rm {} \;
+	find -name "*.o" -exec rm {} \;
+	find -name "*.so" -exec rm {} \;
+	rm -rf ./bin
 
 

@@ -12,34 +12,27 @@ namespace thermostat {
 class GPIO
 {
     public:
-        GPIO(int inPinNumber) : mPinNumber(inPinNumber)
+        enum DIRECTION
         {
-            std::cout << __func__ << " " << mPinNumber << std::endl;
+            OUT,
+            IN
+        };
+
+        explicit GPIO(int inPinNumber, const DIRECTION& inDirection) : mPinNumber(inPinNumber)
+        {
             this->write("/sys/class/gpio/export", mPinNumber);
 
             std::stringstream ss;
             ss << "/sys/class/gpio/gpio" << mPinNumber << "/direction"; 
-            this->write(ss.str(), "out");
+
+	    std::string aDirection = (inDirection == OUT ? "out" : "in");
+
+            this->write(ss.str(), aDirection);
         }
 
         virtual ~GPIO()
         {
-            this->off();
             this->write("/sys/class/gpio/unexport", mPinNumber);
-        }
-
-        void on()
-        {
-	  std::stringstream ss;
-	  ss << "/sys/class/gpio/gpio" << mPinNumber << "/value"; 
-	  this->write(ss.str(), "1");
-        }
-
-        void off()
-        {
-	  std::stringstream ss;
-	  ss << "/sys/class/gpio/gpio" << mPinNumber << "/value"; 
-	  this->write(ss.str(), "0");
         }
 
     protected:
@@ -60,8 +53,7 @@ class GPIO
             
         }
 
-
-  int mPinNumber;
+        int mPinNumber;
 
 };
 

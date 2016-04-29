@@ -7,52 +7,51 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <dlfcn.h>
+#include <boost/shared_ptr.hpp>
 
 template<class I>
 class Module
 {
     public:
+        Module() : mHandle(), mPtr() {}
+
         Module(const std::string& inLib) : mHandle(), mPtr()
         {
-            std::cout << __func__ << " " << inLib << std::endl;
+            char* err;
 
 	    // http://www.linuxjournal.com/article/3687
 	    // http://www.dwheeler.com/program-library/Program-Library-HOWTO/x172.html
-            mHandle = dlopen(inLib.c_str(), RTLD_NOW);
+	    mHandle.reset(dlopen(inLib.c_str(), RTLD_NOW), dlclose);
 
+            err = dlerror();
             if (!mHandle)
 	    {
-                std::cerr << "Issue during dlopen(" << inLib << ") ERROR: " << dlerror() << std::endl;
+                std::cerr << "Issue during dlopen(" << inLib << ") ERROR: " << err << std::endl;
                 throw;
 	    }
 
             I* (*mkr)();
-            mkr = (I* (*)())dlsym(mHandle, "create_module");
+            mkr = (I* (*)())dlsym(mHandle.get(), "create_module");
 
-	    // TODO: this error handleing for dlsym doesn't work; but something like it should be here
-            //char* error = dlerror();
-	    //if ((error = dlerror()) != NULL)
-	    //{
-            //    std::cerr << "Issue during dlsym(" << inLib << ") ERROR: " << error << std::endl;
-            //    throw;
-	    //}
+            err = dlerror();
+	    if (!mkr || err != NULL)
+	    {
+	        std::cerr << "Issue during dlsym(" << inLib << ") ERROR: " << err << std::endl;
+                throw;
+	    }
 
             I* newptr = (mkr)();
 
-            mPtr = std::unique_ptr<I>(newptr);
+            mPtr.reset(newptr);
         }
 
-        virtual ~Module()
-        {
-	    mPtr.reset();
-            dlclose(mHandle);
-        }
+        virtual ~Module() { }
 
-        I* get() { return mPtr.get(); }
-
+        I* operator->() { return mPtr.get(); }
+        
     private:
-        void* mHandle;
-        std::unique_ptr<I> mPtr;
+        boost::shared_ptr<void> mHandle;
+        boost::shared_ptr<I> mPtr;
 
 };
 

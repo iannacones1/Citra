@@ -2,86 +2,71 @@
 
 namespace thermostat {
 
-ThermostatComponent::ThermostatComponent(Interfaces::ISetPointController* inSetPointController,
-                                         Interfaces::IThermometer* inThermometer,
-					 Interfaces::ITemperatureControlAlgorithm* inControlAlgorithm,
-                                         Interfaces::IThermalController* inThermalController,
-                                         Interfaces::IThermostatDisplay* inThermostatDisplay)
+ThermostatComponent::ThermostatComponent()
   : mShutdown(false),
-    mSetPointController(inSetPointController),
-    mThermometer(inThermometer),
-    mControlAlgorithm(inControlAlgorithm),
-    mThermalController(inThermalController),
-    mThermostatDisplay(inThermostatDisplay)
+    mSetPointController(SetPointController),
+    mThermometer(Thermometer),
+    mControlAlgorithm(ControlAlgorithm),
+    mThermalController(ThermalController),
+    mThermostatDisplayList()
 {
-    std::cout << __func__ << std::endl; 
+    for (const std::string& aModule : ThermostatDisplays)
+    {
+        Module<thermostat::Interfaces::IThermostatDisplay> aDisplay(aModule);
+        mThermostatDisplayList.push_back(aDisplay);
+    }
 }
 
-ThermostatComponent::~ThermostatComponent()
+ThermostatComponent::~ThermostatComponent() { }
+
+void ThermostatComponent::shutdown()
 {
-    std::cout << __func__ << std::endl; 
+    mShutdown = true;
 }
 
 void ThermostatComponent::run()
 {
     while (!mShutdown)
     {
-        std::cout << "---" << __func__ << "---" << std::endl;
-
 	bool control = mSetPointController->isSetPointDefined();
 
-        std::cout << " Control Temp = " << (control ? "ON" : "OFF") << std::endl;
+	Interfaces::Control action = Interfaces::STAY;
 
-        float setpoint;
-        float currentTemp;
-	Interfaces::Control action;
+        float setpoint = mSetPointController->currentSetPointFahrenheit();
+
+        float currentTemp = mThermometer->currentTemperatureFahrenheit();
 
         if (control)
 	{
-	    setpoint = mSetPointController->currentSetPointFahrenheit();
-            currentTemp = mThermometer->currentTemperatureFahrenheit();
 	    action = mControlAlgorithm->controlTemperatureFahrenheit(setpoint, currentTemp);
-
-	    std::cout << "Setpoint Temp = " << setpoint << std::endl;
-	    std::cout << " Current Temp = " << currentTemp << std::endl;
-	    std::cout << "  Action Temp = ";
-
-	    switch (action)
-	    {
-	        case Interfaces::STAY :
-		{
-		    mThermalController->stay();
-                    std::cout << "STAY";
-                    break;
-		}
-	        case Interfaces::HEAT :
-                {
-		    mThermalController->heat();
-                    std::cout << "HEAT";
-
-                    break;
-		}
-	        case Interfaces::COOL :
-		{
-		    mThermalController->cool();
-                    std::cout << "COOL";
-                    break;
-		}
-	    }
-
-	    std::cout << std::endl;
 	}
 
-	mThermostatDisplay->display(control, setpoint, currentTemp, action); 
+        switch (action)
+        {
+	    case Interfaces::STAY:
+	    {
+	        mThermalController->stay();
+	        break;
+	    }
+            case Interfaces::HEAT:
+            {
+	        mThermalController->heat();
+                break;
+            }
+            case Interfaces::COOL:
+	    {
+	        mThermalController->cool();
+                break;
+            }
+        }
 
-        sleep(1);
+        for (Module<Interfaces::IThermostatDisplay>& aDisplayPtr : mThermostatDisplayList)
+	{
+            aDisplayPtr->display(control, setpoint, currentTemp, action); 
+	}
+
+        usleep(100000); // 100ms 
     }
-}
-
-void ThermostatComponent::shutdown()
-{
-    std::cout << __func__ << std::endl; 
-    mShutdown = true;
 }
 
 } /* namespace thermostat */

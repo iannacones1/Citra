@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <list>
 
 #include "Interfaces/ISetPointController.h"
 #include "Interfaces/IThermometer.h"
@@ -10,28 +11,35 @@
 #include "Interfaces/IThermalController.h"
 #include "Interfaces/IThermostatDisplay.h"
 
+#include "Module.hpp"
+
 namespace thermostat {
 
 class ThermostatComponent
 {
     public:
-        ThermostatComponent(Interfaces::ISetPointController* inSetPointController,
-	                    Interfaces::IThermometer* inThermometer,
-                            Interfaces::ITemperatureControlAlgorithm* inControlAlgorithm,
-                            Interfaces::IThermalController* inThermalController,
-                            Interfaces::IThermostatDisplay* inThermostatDisplay);
-
+        ThermostatComponent();
         virtual ~ThermostatComponent();
         void run();
         void shutdown();
 
     protected:
+        CONFIGURABLE
+	(
+	    (std::string) SetPointController,
+	    (std::string) Thermometer,
+	    (std::string) ControlAlgorithm,
+	    (std::string) ThermalController,
+	    (std::list<std::string>) ThermostatDisplays
+        )
+	INITIALIZE(ThermostatComponent);
+
         bool mShutdown;
-        Interfaces::ISetPointController* mSetPointController;
-        Interfaces::IThermometer* mThermometer;
-        Interfaces::ITemperatureControlAlgorithm* mControlAlgorithm;
-	Interfaces::IThermalController* mThermalController;
-	Interfaces::IThermostatDisplay* mThermostatDisplay;
+        Module<thermostat::Interfaces::ISetPointController> mSetPointController;
+        Module<thermostat::Interfaces::IThermometer> mThermometer;
+        Module<thermostat::Interfaces::ITemperatureControlAlgorithm> mControlAlgorithm;
+        Module<thermostat::Interfaces::IThermalController> mThermalController;
+	std::list<Module<thermostat::Interfaces::IThermostatDisplay> > mThermostatDisplayList;
 };
 
 } /* namespace thermostat */
