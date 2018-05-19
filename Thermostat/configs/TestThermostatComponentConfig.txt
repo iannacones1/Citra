@@ -1,0 +1,5 @@
+ThermostatComponent SetPointController ./lib/ButtonSetPointController.so
+ThermostatComponent Thermometer        ./lib/TestThermometer.so
+ThermostatComponent ControlAlgorithm   ./lib/BangBangController.so
+ThermostatComponent ThermalController  ./lib/PowerSwitchTailController.so
+ThermostatComponent ThermostatDisplays ./lib/ControlOutputDisplay.so

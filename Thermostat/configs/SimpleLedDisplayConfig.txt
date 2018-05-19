@@ -1,0 +1,6 @@
+SimpleLedDisplay MainLedPin  18
+SimpleLedDisplay RedLedPin   17
+SimpleLedDisplay GreenLedPin 27
+SimpleLedDisplay BlueLedPin  22
+
+

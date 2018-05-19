@@ -1,0 +1,6 @@
+LcdDisplay LCD_RS 26
+LcdDisplay LCD_E  19
+LcdDisplay LCD_D4 21
+LcdDisplay LCD_D5 20
+LcdDisplay LCD_D6 16
+LcdDisplay LCD_D7 12
