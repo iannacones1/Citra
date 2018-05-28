@@ -1,71 +1,95 @@
+#include <algorithm>
 #include <QtGui/QtGui>
 
-static const int W = 640;
-static const int H = 384;
-static const int space = 40;
+static const int SPACEING    = 30;
+static const int FONT_HEIGHT = 23;
 
 namespace Citra { namespace mlbClock {
 
 class linescoreGraphicsItem : public QGraphicsItem
 {
-	linescoreGraphicsItem()
-	{
-		int x = 150;
-		int y = 150 + space;
-		int h = 23;
+public:
+    linescoreGraphicsItem(const game& inGame) : mGame(inGame), mInningCount(std::min(mGame.away().innings.size(), (size_t)9)) { }
+    virtual ~linescoreGraphicsItem() { }
 
-		for (size_t i = 0; i < aGame.away().innings.size(); i++)
-		{
-			addText(x, y, QString::number(i + 1), scene);
-		}
+    virtual QRectF boundingRect() const
+    {
+        float w = 0;
+        w += SPACEING * 1.25;         // Team names
+        w += SPACEING * mInningCount; // inning scores
+        w += SPACEING * 3.25;          // R H E
+        return QRectF(0, 0, w, FONT_HEIGHT * 3);
+    }
 
-		y += (space/4);
+    int width()  const { return boundingRect().width();  }
+    int height() const { return boundingRect().height(); }
 
-		addText(x, y, QString("R"), scene);
-		addText(x, y, QString("H"), scene);
-		addText(x, y, QString("E"), scene);
+    virtual void paint(QPainter* inPainter, const QStyleOptionGraphicsItem* /* Option */, QWidget* /* inWidget */)
+    {
+        int x = SPACEING * 1.25;
+        int y = 0;
 
-		x += h;
+        for (size_t i = 0; i < mInningCount; i++)
+        {
+            addText(inPainter, x, y, QString::number(i + 1));
+        }
 
-		BOOST_FOREACH(const team& aTeam, aGame.teams)
-		{
-			y = 150;
+        x += (SPACEING/4);
 
-			addText(x, y, aTeam.name_abbrev, scene);
+        addText(inPainter, x, y, QString("R"));
+        addText(inPainter, x, y, QString("H"));
+        addText(inPainter, x, y, QString("E"));
 
-			y += space/2;
+        y += FONT_HEIGHT;
 
-			BOOST_FOREACH(const std::string& aRun, aTeam.innings)
-			{
-				addText(x, y, aRun, scene);
-			}
+        BOOST_FOREACH(const team& aTeam, mGame.teams)
+        {
+            x = 0;
 
-			y += (space/4);
+            QRectF rect(x, y, SPACEING * 1.25, FONT_HEIGHT);
+            inPainter->drawText(rect, Qt::AlignVCenter, QString::fromStdString(aTeam.name_abbrev));
+            x += rect.width();
 
-			addText(x, y, QString::number(aTeam.runs), scene);
-			addText(x, y, QString::number(aTeam.hits), scene);
-			addText(x, y, QString::number(aTeam.errors), scene);
+            for (size_t i = 0; i < mInningCount; i++)
+            {
+                if (i < aTeam.innings.size())
+                {
+                    addText(inPainter, x, y, aTeam.innings[i]);
+                }
+                else
+                {
+                    x += SPACEING;
+                }
 
-			x += h;
-		}
-		std::cout << std::endl;
-	}
-	virtual ~linescoreGraphicsItem() { }
+            }
 
-	void addText(int& x, int& y, const QString& inText, QGraphicsScene* scene)
-	{
-		QGraphicsTextItem* textItem = new QGraphicsTextItem(inText);
-		textItem->setPos(y, x);
-		scene->addItem(textItem);
-		y += space/2;
+            x += (SPACEING/4);
 
-		textItem->moveBy(-textItem->boundingRect().width()/2, 0);
-	}
+            addText(inPainter, x, y, QString::number(aTeam.runs));
+            addText(inPainter, x, y, QString::number(aTeam.hits));
+            addText(inPainter, x, y, QString::number(aTeam.errors));
 
-	void addText(int& x, int& y, const std::string& inText, QGraphicsScene* scene)
-	{
-		addText(x, y, QString::fromStdString(inText), scene);
-	}
-}
+            y += FONT_HEIGHT;
+        }
+    }
+
+    void addText(QPainter* inPainter, int& x, int& y, const QString& inText)
+    {
+        QRectF rect(x, y, SPACEING, FONT_HEIGHT);
+
+        inPainter->drawText(rect, Qt::AlignCenter, inText);
+
+        x += rect.width();
+    }
+
+    void addText(QPainter* inPainter, int& x, int& y, const std::string& inText)
+    {
+        addText(inPainter, x, y, QString::fromStdString(inText));
+    }
+
+protected:
+    game mGame;
+    size_t mInningCount;
+};
 
 } /* namespace mlbClock */ } /* namespace Citra */

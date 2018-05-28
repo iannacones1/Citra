@@ -5,12 +5,14 @@
 #include <boost/foreach.hpp>
 
 #include "DataGrabber.hpp"
+#include <Display/EinkDisplay.h>
 
-static const int W = 640;
-static const int H = 384;
-static const int space = 40;
+#include "linescoreGraphicsItem.hpp"
 
 namespace Citra { namespace mlbClock {
+
+static const int W = Citra::Display::ImageBuffer::WIDTH;
+static const int H = Citra::Display::ImageBuffer::HEIGHT;
 
 mlbClockComponent::mlbClockComponent() : mShutdown(false) { }
 
@@ -21,97 +23,70 @@ void mlbClockComponent::shutdown()
     mShutdown = true;
 }
 
-void mlbClockComponent::addText(int& x, int& y, const QString& inText, QGraphicsScene* scene)
+unsigned char mask(const QColor& inColor)
 {
-    QGraphicsTextItem* textItem = new QGraphicsTextItem(inText);
-    textItem->setPos(y, x);
-    scene->addItem(textItem);
-    y += space/2;
-
-    textItem->moveBy(-textItem->boundingRect().width()/2, 0);
-}
-
-void mlbClockComponent::addText(int& x, int& y, const std::string& inText, QGraphicsScene* scene)
-{
-	addText(x, y, QString::fromStdString(inText), scene);
+    return (inColor != Qt::white ? 0x00 : 0xFF);
 }
 
 void mlbClockComponent::run()
 {
-//    while (!mShutdown)
-//    {
-	      std::list<game> aGames = DataGrabber::getGames();
+    int z = 0;
 
-          QGraphicsScene* scene = new QGraphicsScene(0, 0, W, H);
-          QGraphicsView* view = new QGraphicsView(scene);
+    Display::EinkDisplay epd;
+    if (!epd.initialize())
+    {
+        std::cerr << "e-Paper init failed" << std::endl;
+        return;
+    }
 
-          QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(QImage("../phillies_p.bmp")));
-	      scene->addItem(item);
+    std::list<game> aGames = DataGrabber::getGames();
 
+    while (!mShutdown)
+    {
+        QGraphicsScene* scene = new QGraphicsScene(0, 0, W, H);
 
-	      BOOST_FOREACH(const game& aGame, aGames)
-	      {
-	    	  if (aGame.containsTeam("PHI"))
-	    	  {
-                  int x = 150;
-            	  int y = 150 + space;
-            	  int h = 23;
+        QGraphicsRectItem* background = new QGraphicsRectItem(0, 0, W, H);
+        background->setPen(QPen((Qt::white)));
+        background->setBrush(QBrush((Qt::white)));
+        scene->addItem(background);
 
-            	  size_t numIn = std::max(aGame.away().innings.size(), (size_t)9);
-                  for (size_t i = 0; i < numIn; i++)
-                  {
-                	  addText(x, y, QString::number(i + 1), scene);
-                  }
+        QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(QImage("../phillies_p.bmp")));
+        scene->addItem(item);
 
-                  y += (space/4);
+        BOOST_FOREACH(const game& aGame, aGames)
+        {
+            if (aGame.containsTeam("PHI"))
+            {
+                linescoreGraphicsItem* aLinescore = new linescoreGraphicsItem(aGame);
+                aLinescore->setPos(W/2, H/2);
+                aLinescore->moveBy(-aLinescore->width()/2, 0);
+                scene->addItem(aLinescore);
+            }
+        }
 
-                  addText(x, y, QString("R"), scene);
-                  addText(x, y, QString("H"), scene);
-                  addText(x, y, QString("E"), scene);
+        scene->addItem(new QGraphicsTextItem(QString::number(z++)));
 
-		          x += h;
+        QImage aImage(W, H, QImage::Format_RGB32);
+        QPainter painter(&aImage);
+        scene->render(&painter);
 
-                  BOOST_FOREACH(const team& aTeam, aGame.teams)
-	    	      {
-                	  y = 150;
+        Citra::Display::ImageBuffer aImgBuf;
 
-                      addText(x, y, aTeam.name_abbrev, scene);
+        for (int y = 0; y < H; y++)
+        {
+            for (int x = 0; x < W; x += 2)
+            {
+                unsigned char d = 0x00;
 
-                      y += space/2;
+                d |= 0x30 & mask(aImage.pixel(x    , y));
+                d |= 0x03 & mask(aImage.pixel(x + 1, y));
 
-//			          BOOST_FOREACH(const std::string& aRun, aTeam.innings)
-//			          {
-//	                      addText(x, y, aRun, scene);
-//                      }
+                aImgBuf.set(x/2, y, d);
+            }
+        }
 
-                      for (size_t i = 0; i < numIn; i++)
-                      {
-                    	  if (i < aTeam.innings.size())
-                    	  {
-                    		  addText(x, y, aTeam.innings[i], scene);
-                    	  }
-                    	  else
-                    	  {
-                    		    y += space/2;
-                    	  }
-                      }
-
-			          y += (space/4);
-
-                      addText(x, y, QString::number(aTeam.runs), scene);
-                      addText(x, y, QString::number(aTeam.hits), scene);
-                      addText(x, y, QString::number(aTeam.errors), scene);
-
-			          x += h;
-	    	      }
-		          std::cout << std::endl;
-	    	  }
-	      }
-
-	      view->show();
-
-//        sleep(1);
-//    }
+        epd.display(aImgBuf);
+    }
 }
 
 } /* namespace mlbClock */ } /* namespace Citra */

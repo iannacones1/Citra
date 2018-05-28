@@ -14,6 +14,7 @@ MFLAGS = $(FLAGS) -fPIC -shared -o
 
 ALL =  
 
+include Display/Makefile
 include Language/Makefile
 include Configurable/Makefile
 include mlbClock/Makefile
