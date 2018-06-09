@@ -25,6 +25,18 @@ class ImageBuffer
 
     virtual ~ImageBuffer() { }
 
+    bool operator==(const ImageBuffer& inImageBuffer) const
+    {
+        bool is_equal = inImageBuffer.mData.size() == this->mData.size();
+
+        for (size_t i = 0; i < mData.size(); i++)
+        {
+            is_equal &= inImageBuffer.mData[i] == this->mData[i];
+        }
+
+        return is_equal;
+    }
+
     int length() const { return mData.size(); }
 
     void set(int inW, int inH, unsigned char inVal)

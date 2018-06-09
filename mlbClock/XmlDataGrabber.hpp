@@ -65,20 +65,34 @@ struct mlbBatter : public mlbPlayer
     float ops;
     int   rbi;
     float slg;
+
+    std::string Summary() const
+    {
+        std::stringstream ss;
+        ss << name_display_roster << " (" << h << "-" << ab << ", " << avg << " AVG)";
+        return ss.str();
+    }
 };
 
 struct mlbPitcher : public mlbPlayer
 {
-    float era;
+    std::string era; // if a pitcher doesn't have an era they put in "-.--"
     int   losses;
     int   wins;
     int   saves;
     int   svo;
 
+    std::string Summary() const
+    {
+        std::stringstream ss;
+        ss << name_display_roster << " (" << era << ")";
+        return ss.str();
+    }
+
     std::string winSummary() const
     {
         std::stringstream ss;
-        ss << name_display_roster << " (" << wins << "-" << losses << ", " << era << ")";
+        ss << name_display_roster << " (" << wins << "-" << losses << ", " << era << " ERA)";
         return ss.str();
     }
 
@@ -100,14 +114,28 @@ struct team
         return (team_name == inTeamName || name_abbrev == inTeamName);
     }
 
+    std::string record() const
+    {
+        std::stringstream ss;
+        ss << wins << "-" << losses << std::endl;
+        return ss.str();
+    }
+
     std::string TYPE;
     std::string team_name;
     std::string name_abbrev;
+
+    int wins;
+    int losses;
+
+    std::string time;
+    std::string ampm;
+
     std::vector<int> innings;
     int runs;
     int hits;
     int errors;
-
+    boost::optional<mlbPitcher> probable_pitcher;
 };
 
 struct game
@@ -145,13 +173,28 @@ struct game
 
     std::string gameTime() const
     {
-        return time + " " + time_zone;
+        return time + " " + ampm;
+    }
+
+
+    std::string teamTime(const std::string& inTeamName) const
+    {
+        BOOST_FOREACH(const team& aTeam, teams)
+        {
+            if (aTeam.isNamed(inTeamName))
+            {
+                return aTeam.time + " " + aTeam.ampm;
+            }
+        }
+
+        throw;
     }
 
     std::string BSO() const
     {
         std::stringstream ss;
-        ss << balls << "-" << strikes << " " << outs << " outs";
+        ss << balls << "-" << strikes << " " << outs << " out";
+
         return ss.str();
     }
 
@@ -172,6 +215,7 @@ struct game
 
     std::string time;
     std::string time_zone;
+    std::string ampm;
 
 //    <batter ab="1" avg=".242" first="Nick" h="1" hr="6" id="608384" last="Williams" name_display_roster="Williams" number="5" obp=".311" ops=".736" pos="LF" rbi="14" slg=".425"/>
 //    <pitcher er="1" era="3.18" first="Dereck" id="605446" ip="2.1" last="Rodriguez" losses="0" name_display_roster="Rodriguez" number="57" wins="0"/>
@@ -280,7 +324,7 @@ bool updatePlayer(mlbPlayer& outPlayer, rapidxml::xml_node<>* inNode)
     valid &= assignValue(outPlayer.last,                inNode->first_attribute("last"               ));
     valid &= assignValue(outPlayer.number,              inNode->first_attribute("number"             ));
     valid &= assignValue(outPlayer.name_display_roster, inNode->first_attribute("name_display_roster"));
-    assignValue(outPlayer.pos,                 inNode->first_attribute("pos"                ));
+             assignValue(outPlayer.pos,                 inNode->first_attribute("pos"                ));
 
     return valid;
 }
@@ -294,8 +338,8 @@ boost::optional<mlbPitcher> buildPitcher(rapidxml::xml_node<>* inNode)
         valid &= assignValue(aPitcher.era,    inNode->first_attribute("era"   ));
         valid &= assignValue(aPitcher.losses, inNode->first_attribute("losses"));
         valid &= assignValue(aPitcher.wins,   inNode->first_attribute("wins"  ));
-        assignValue(aPitcher.saves,  inNode->first_attribute("saves" ));
-        assignValue(aPitcher.svo,    inNode->first_attribute("svo"   ));
+                 assignValue(aPitcher.saves,  inNode->first_attribute("saves" ));
+                 assignValue(aPitcher.svo,    inNode->first_attribute("svo"   ));
 
         if (valid)
         {
@@ -340,12 +384,25 @@ game buildGame(rapidxml::xml_node<>* inGameNode)
         assignValue(aGame.Day,       inGameNode->first_attribute(DAY));
         assignValue(aGame.time,      inGameNode->first_attribute("time"));
         assignValue(aGame.time_zone, inGameNode->first_attribute("time_zone"));
+        assignValue(aGame.ampm,      inGameNode->first_attribute("ampm"));
 
         assignValue(aGame.home().team_name,   inGameNode->first_attribute("home_team_name"));
         assignValue(aGame.home().name_abbrev, inGameNode->first_attribute("home_name_abbrev"));
 
         assignValue(aGame.away().team_name,   inGameNode->first_attribute("away_team_name"));
         assignValue(aGame.away().name_abbrev, inGameNode->first_attribute("away_name_abbrev"));
+
+        assignValue(aGame.home().wins,   inGameNode->first_attribute("home_win"));
+        assignValue(aGame.home().losses, inGameNode->first_attribute("home_loss"));
+
+        assignValue(aGame.away().wins,   inGameNode->first_attribute("away_win"));
+        assignValue(aGame.away().losses, inGameNode->first_attribute("away_loss"));
+
+        assignValue(aGame.home().time, inGameNode->first_attribute("time_hm_lg"));
+        assignValue(aGame.home().ampm, inGameNode->first_attribute("home_ampm"));
+
+        assignValue(aGame.away().time, inGameNode->first_attribute("time_aw_lg"));
+        assignValue(aGame.away().ampm, inGameNode->first_attribute("away_ampm"));
 
         rapidxml::xml_node<>* aStatusNode = inGameNode->first_node(STATUS);
 
@@ -386,6 +443,9 @@ game buildGame(rapidxml::xml_node<>* inGameNode)
             }
         }
 
+        aGame.home().probable_pitcher = buildPitcher(inGameNode->first_node("home_probable_pitcher"));
+        aGame.away().probable_pitcher = buildPitcher(inGameNode->first_node("away_probable_pitcher"));
+
         aGame.winning_pitcher = buildPitcher(inGameNode->first_node("winning_pitcher"));
         aGame.losing_pitcher  = buildPitcher(inGameNode->first_node("losing_pitcher"));
         aGame.save_pitcher    = buildPitcher(inGameNode->first_node("save_pitcher"));
@@ -417,9 +477,9 @@ inline bool fileExists(const std::string& name)
 
 bool containsTeam(rapidxml::xml_node<>* aGameNode, const std::string& inTeam)
 {
-    return  aGameNode->first_attribute("home_team_name")->value() == inTeam ||
+    return  aGameNode->first_attribute("home_team_name")->value()   == inTeam ||
             aGameNode->first_attribute("home_name_abbrev")->value() == inTeam ||
-            aGameNode->first_attribute("away_team_name")->value() == inTeam ||
+            aGameNode->first_attribute("away_team_name")->value()   == inTeam ||
             aGameNode->first_attribute("away_name_abbrev")->value() == inTeam;
 }
 
@@ -438,7 +498,7 @@ class DataGrabber
 
             std::string aFileName = ss.str();
 
-            if (!fileExists(aFileName))
+//            if (!fileExists(aFileName))
             {
                 std::string aCmd = "wget -p -q http://";
                 aCmd += aFileName;

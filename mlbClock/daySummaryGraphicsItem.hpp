@@ -1,3 +1,6 @@
+#ifndef _DAY_SUMMARY_GRAPHICS_ITEM_HPP_
+#define _DAY_SUMMARY_GRAPHICS_ITEM_HPP_
+
 #include <QtGui/QtGui>
 
 namespace Citra { namespace mlbClock {
@@ -60,7 +63,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
             }
             else
             {
-                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.gameTime()));
+                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.teamTime("PHI")));
             }
 
         }
@@ -87,3 +90,5 @@ protected:
 };
 
 } /* namespace mlbClock */ } /* namespace Citra */
+
+#endif /* _DAY_SUMMARY_GRAPHICS_ITEM_HPP_ */

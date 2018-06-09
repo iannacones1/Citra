@@ -1,3 +1,6 @@
+#ifndef _LINESCORE_GRAPHICS_ITEM_HPP_
+#define _LINESCORE_GRAPHICS_ITEM_HPP_
+
 #include <algorithm>
 #include <QtGui/QtGui>
 
@@ -62,11 +65,12 @@ public:
 
         y += FONT_HEIGHT;
 
-        if (mGame.inning && mGame.inning_state)
+        if (mGame.inning && mGame.inning_state && (mGame.inning_state.get() == "Top" || mGame.inning_state.get() == "Bottom"))
         {
             int yLoc = (mGame.inning_state.get() == "Top" ? y : y + FONT_HEIGHT);
 
-            QRectF rect(x + (SPACEING * (mGame.inning.get() - 1)), yLoc, SPACEING, FONT_HEIGHT);
+//            std::cout << mGame.inning_state.get() << " " << mGame.inning.get() << std::endl;
+            QRectF rect(SPACEING * 1.5 + (SPACEING * (mGame.inning.get() - 1)), yLoc, SPACEING, FONT_HEIGHT);
             inPainter->drawRect(rect);
         }
 
@@ -111,13 +115,41 @@ public:
 
         if (!mGame.isOver())
         {
-            addDiamond(inPainter, x + h * 0.25, h/2, h/4 - 4);
-            addDiamond(inPainter, x + h * 0.50, h/4, h/4 - 4);
-            addDiamond(inPainter, x + h * 0.75, h/2, h/4 - 4);
+//            if (mGame.runner_on_1b) { std::cout << "Man on 1st" << std::endl; }
+//            if (mGame.runner_on_2b) { std::cout << "Man on 2nd" << std::endl; }
+//            if () { std::cout << "Man on 3rd" << std::endl; }
+
+            addDiamond(inPainter, x + h * 0.25, h/2, h/4 - 4,mGame.runner_on_3b);
+            addDiamond(inPainter, x + h * 0.50, h/4, h/4 - 4,mGame.runner_on_2b);
+            addDiamond(inPainter, x + h * 0.75, h/2, h/4 - 4,mGame.runner_on_1b);
 
             inPainter->setFont(QFont("lato", 10));
             QRectF rect(x, FONT_HEIGHT * 2 , h, FONT_HEIGHT);
             inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.BSO()));
+        }
+
+        boost::optional<mlbPitcher> pitcher;
+        boost::optional<mlbBatter> batter;
+        {
+            std::stringstream ss;
+
+            if (mGame.pitcher)
+            {
+                ss << "   P: " << mGame.pitcher.get().Summary();
+            }
+
+            if (mGame.batter)
+            {
+                ss << "   AB: " << mGame.batter.get().Summary();
+            }
+
+            if (mGame.pitcher || mGame.batter)
+            {
+                QRectF rect(0, y, x, FONT_HEIGHT);
+                inPainter->setFont(QFont("lato", 10));
+                inPainter->drawText(rect, Qt::AlignLeft, QString::fromStdString(ss.str()));
+                y += FONT_HEIGHT;
+            }
         }
 
         {
@@ -125,12 +157,12 @@ public:
 
             if (mGame.winning_pitcher)
             {
-                ss << " W: " << mGame.winning_pitcher.get().winSummary();
+                ss << "   W: " << mGame.winning_pitcher.get().winSummary();
             }
 
             if (mGame.losing_pitcher)
             {
-                ss << " L: " << mGame.losing_pitcher.get().winSummary();
+                ss << "   L: " << mGame.losing_pitcher.get().winSummary();
             }
 
             if (mGame.winning_pitcher || mGame.losing_pitcher)
@@ -147,7 +179,7 @@ public:
 
             if (mGame.save_pitcher)
             {
-                ss << " S: " << mGame.save_pitcher.get().saveSummary();
+                ss << "   S: " << mGame.save_pitcher.get().saveSummary();
 
                 QRectF rect(0, y, x, FONT_HEIGHT);
                 inPainter->setFont(QFont("lato", 10));
@@ -158,19 +190,30 @@ public:
 
     }
 
-    void addDiamond(QPainter* inPainter, int x, int y, int r)
+    void addDiamond(QPainter* inPainter, int x, int y, int r, bool inFill)
     {
-        QPolygonF outLine;
-        outLine << QPointF(x    , y - r);
-        outLine << QPointF(x + r, y    );
-        outLine << QPointF(x    , y + r);
-        outLine << QPointF(x - r, y);
+        QPainterPath path;
+        path.moveTo(x    , y - r);
+        path.lineTo(x + r, y    );
+        path.lineTo(x    , y + r);
+        path.lineTo(x - r, y    );
+        path.lineTo(x    , y - r);
 
-        QBrush aBrush = inPainter->brush();
-        aBrush.setColor(Qt::black);
-        inPainter->setBrush(aBrush);
+        if (inFill)
+        {
+            inPainter->fillPath(path, QBrush(QColor ("black")));
+        }
+        else
+        {
+//            QPolygonF outLine;
+//            outLine << QPointF(x    , y - r);
+//            outLine << QPointF(x + r, y    );
+//            outLine << QPointF(x    , y + r);
+//            outLine << QPointF(x - r, y);
+//            inPainter->drawPolygon(outLine);
+            inPainter->drawPath(path);
+        }
 
-        inPainter->drawPolygon(outLine);
     }
 
     void addText(QPainter* inPainter, int& x, int& y, const QString& inText)
@@ -198,3 +241,5 @@ protected:
 };
 
 } /* namespace mlbClock */ } /* namespace Citra */
+
+#endif /* _LINESCORE_GRAPHICS_ITEM_HPP_ */

@@ -86,6 +86,11 @@ bool EinkDisplay::initialize()
 
 void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 {
+    if (inImageBuffer == mCurrentBuffer)
+    {
+        return;
+    }
+
     sendCommand(DATA_START_TRANSMISSION_1);
 
     for(int i = 0; i < inImageBuffer.length(); i++)
