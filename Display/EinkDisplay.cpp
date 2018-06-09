@@ -107,6 +107,20 @@ void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
     mCurrentBuffer = inImageBuffer;
 }
 
+void EinkDisplay::set(unsigned char inChar, int inNum)
+{
+    sendCommand(DATA_START_TRANSMISSION_1);
+
+    for(int i = 0; i < inNum; i++)
+    {
+        sendData(inChar);
+    }
+
+    sendCommand(DISPLAY_REFRESH);
+    bcm2835_delay(100);
+    waitUntilIdle();
+}
+
 void EinkDisplay::sendCommand(unsigned char command)
 {
     bcm2835_gpio_write(DC_PIN, LOW);

@@ -29,7 +29,5 @@ int main(int argc, char* argv[])
     }
 
     std::cout << "(DONE)" << std::endl;
-
-//    return app.exec();
     return 0;
 }

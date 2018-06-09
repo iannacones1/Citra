@@ -21,5 +21,12 @@ sudo apt-get update
  sudo make check
  sudo make install
 
+- install rapidXml
+wget https://downloads.sourceforge.net/project/rapidxml/rapidxml/rapidxml%201.13/rapidxml-1.13.zip
+unzip rapidxml-1.13.zip
+sudo cp -r rapidxml-1.13 /usr/include/
+ echo "#include \"rapidxml-1.13/rapidxml.hpp\"" > rapidxml
+sudo mv rapidxml /usr/include/
+
 - clone Citra
  git clone https://github.com/iannacones1/Citra.git

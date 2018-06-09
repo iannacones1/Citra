@@ -14,6 +14,7 @@ class EinkDisplay
     bool initialize();
     void display(const ImageBuffer& inImageBuffer);
 
+    void set(unsigned char inChar, int inNum);
   protected:
     void waitUntilIdle();
     void reset();
