@@ -23,7 +23,7 @@ class TestThermalController : public Interfaces::IThermalController
 
             if (!aFileStream)
             {
-	            std::cout << " OPERATION FAILED: Unable to open file " << inFileName << std::endl;
+	            std::cerr << " OPERATION FAILED: Unable to open file " << inFileName << std::endl;
 	            return;
             }
 

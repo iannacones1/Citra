@@ -43,8 +43,8 @@ class GPIObase
 
             if (!aFileStream)
             {
-	            std::cout << " OPERATION FAILED: Unable to open file " << inFileName << std::endl;
-	            std::cout << " !!! MUST RUN AS ROOT to acess /sys/class/gpio/" << std::endl;
+	            std::cerr << " OPERATION FAILED: Unable to open file " << inFileName << std::endl;
+	            std::cerr << " !!! MUST RUN AS ROOT to acess /sys/class/gpio/" << std::endl;
 	            return;
 	        }
 

@@ -32,10 +32,10 @@ class GPin : public GPIObase
                 file.close();
             }
             else
-	        {
-                std::cout << " OPERATION FAILED: Unable to open file " << ss.str() << std::endl;
-	            std::cout << " !!! MUST RUN AS ROOT to acess /sys/class/gpio/" << std::endl;
-	        }
+	    {
+                std::cerr << " OPERATION FAILED: Unable to open file " << ss.str() << std::endl;
+	        std::cerr << " !!! MUST RUN AS ROOT to acess /sys/class/gpio/" << std::endl;
+	    }
 
 	        return txt;
         }

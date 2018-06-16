@@ -3,12 +3,18 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include "FileConfigurator.h"
 
 namespace Citra { namespace Configurable {
 
-FileConfigurator::FileConfigurator(const std::string& inConfigFile) { addFileData(inConfigFile); }
+FileConfigurator::FileConfigurator(int argc, char* argv[], const std::string& inConfigFile)
+ : IConfigurator(argc, argv)
+{
+    addFileData(inConfigFile);
+}
+
 FileConfigurator::~FileConfigurator() { }
 
 void FileConfigurator::addFileData(const std::string& inConfigFile)
@@ -44,8 +50,10 @@ std::string FileConfigurator::getValue(const std::string& inClassName, const std
             return aConfig.Value;
         }
     }
-    std::cerr << "FileConfigurator unknown configuration " << inClassName << "::" << inConfigName << std::endl;
-    throw;
+    std::stringstream ss;
+    ss << "FileConfigurator unknown configuration " << inClassName << "::" << inConfigName;
+    std::cerr << ss.str() << std::endl;
+    throw std::runtime_error(ss.str());
 }
 
 

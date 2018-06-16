@@ -13,6 +13,8 @@ class CommandLineConfigurator : public IConfigurator
         CommandLineConfigurator(int argc, char* argv[]);
         virtual ~CommandLineConfigurator();
 
+        virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType);
+
     protected:
         struct Configuration
         {
@@ -31,7 +33,6 @@ class CommandLineConfigurator : public IConfigurator
         virtual std::list<std::string> getValues(const std::string& inClassName, const std::string& inConfigName);
 
         std::list<Configuration> mConfigurations;
-
 };
 
 } /* namespace Configurable*/ } /* namespace Citra */

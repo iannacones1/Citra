@@ -10,7 +10,7 @@ namespace Citra { namespace Configurable {
 class FileConfigurator : public IConfigurator
 {
     public:
-        FileConfigurator(const std::string& inConfigFile);
+        FileConfigurator(int argc, char* argv[], const std::string& inConfigFile);
         virtual ~FileConfigurator();
 
     protected:

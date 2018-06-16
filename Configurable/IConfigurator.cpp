@@ -4,7 +4,7 @@ namespace Citra { namespace Configurable {
 
 IConfigurator* IConfigurator::m_pInstance = NULL;
 
-IConfigurator::IConfigurator()
+IConfigurator::IConfigurator(int argc, char* argv[]) : mHelp(false)
 {
 	if (m_pInstance)
 	{
@@ -12,6 +12,11 @@ IConfigurator::IConfigurator()
 		throw;
 	}
 	m_pInstance = this;
+
+    for (int i = 0; i < argc; i++)
+    {
+        mHelp |= (std::string(argv[i]) == "-h" || std::string(argv[i]) == "--help");
+    }
 }
 
 IConfigurator::~IConfigurator()
@@ -27,6 +32,11 @@ IConfigurator* IConfigurator::Instance()
 		throw;
 	}
 	return m_pInstance;
+}
+
+bool IConfigurator::help()
+{
+    return Instance()->mHelp;
 }
 
 } /* namespace Configurable*/ } /* namespace Citra */

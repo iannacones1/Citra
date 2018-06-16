@@ -13,18 +13,24 @@ void signalHandler(int /* inSigNum */)
     if (aThermostatPtr) { aThermostatPtr->shutdown(); }
 }
 
-int main(int /* argc */, char* argv[])
+int main(int argc, char* argv[])
 {
     signal(SIGINT, signalHandler);
 
     std::cout << "Running " << argv[0] << std::endl;
 
     {
-        Citra::Configurable::FileConfigurator aConfigurator("../Thermostat/configs/TestThermostatComponentConfig.txt");
-//        Citra::Configurable::FileConfigurator bConfigurator("../Thermostat/configs/ThermostatComponentConfig.txt");
+        Citra::Configurable::FileConfigurator aConfigurator(argc, argv, "../Thermostat/configs/TestThermostatComponentConfig.txt");
+//        Citra::Configurable::FileConfigurator bConfigurator(argc, argv, "../Thermostat/configs/ThermostatComponentConfig.txt");
 //    	  Citra::Configurable::CommandLineConfigurator cConfigurator(argc, argv);
 
         Citra::Thermostat::ThermostatComponent aThermostat;
+
+        if (Citra::Configurable::IConfigurator::help())
+        {
+            std::cout << "(HELP DONE)" << std::endl;
+            return 0;
+        }
 
         aThermostatPtr = &aThermostat;
 

@@ -1,6 +1,7 @@
 #ifndef _MODULE_HPP_
 #define _MODULE_HPP_
 
+#include <iostream>
 #include <string>
 #include <memory>
 
@@ -19,6 +20,8 @@ class Module
 
         Module(const std::string& inLib) : mHandle(), mPtr()
         {
+            if (inLib.empty()) { return; }
+
             char* err;
 
 	        // http://www.linuxjournal.com/article/3687

@@ -8,11 +8,17 @@
 
 namespace Citra { namespace Configurable {
 
-CommandLineConfigurator::CommandLineConfigurator(int argc, char* argv[]) { addData(argc, argv); }
+CommandLineConfigurator::CommandLineConfigurator(int argc, char* argv[])
+ : IConfigurator(argc, argv)
+{
+    addData(argc, argv);
+}
+
 CommandLineConfigurator::~CommandLineConfigurator() { }
 
 void CommandLineConfigurator::addData(int argc, char* argv[])
 {
+    std::cout << __func__ << std::endl;
 	if (!argc % 2)
 	{
 		std::cerr << "bad num " << argc << " " << argc % 2 << std::endl;
@@ -24,6 +30,11 @@ void CommandLineConfigurator::addData(int argc, char* argv[])
 		std::cout << std::string(argv[i]) << " = " << std::string(argv[i + 1]) << std::endl;
 		mConfigurations.push_back(Configuration(argv[i], argv[i + 1]));
 	}
+}
+
+void CommandLineConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
+{
+    std::cout << "--" << inClassName << "::" << inConfigName << " = " << inType << std::endl;
 }
 
 std::string CommandLineConfigurator::getValue(const std::string& inClassName, const std::string& inConfigName)
