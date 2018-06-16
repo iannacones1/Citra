@@ -1,5 +1,6 @@
+THER_MOD_DIR    := Thermostat/Modules/
 THERMOSTAT_OBJS := $(OBJ_DIR)Thermostat.o $(OBJ_DIR)ThermostatComponent.o
-THERMOSTAT_MODS := $(patsubst %.cpp, %.so, $(wildcard Thermostat/Modules/*.cpp))
+THERMOSTAT_MODS := $(patsubst %.cpp, %.so, $(wildcard $(THER_MOD_DIR)*.cpp))
 
 Thermostat: $(CONFIGURABLE_OBJS) $(THERMOSTAT_OBJS)
 	mkdir -p $(BIN_DIR)	
@@ -13,7 +14,7 @@ $(OBJ_DIR)ThermostatComponent.o: Thermostat/ThermostatComponent.h Thermostat/The
 	mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) Thermostat/ThermostatComponent.cpp -o $(OBJ_DIR)ThermostatComponent.o
 
-%.so: %.cpp
+$(THER_MOD_DIR)%.so: $(THER_MOD_DIR)%.cpp
 	mkdir -p $(LIB_DIR)
 	$(CC) $(MFLAGS) $(LIB_DIR)$(notdir $@) $< -lboost_thread
 

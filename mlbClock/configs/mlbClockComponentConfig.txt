@@ -1,0 +1,3 @@
+mlbClockComponent DisplayModule ./lib/EinkDisplayModule.so
+#mlbClockComponent DisplayModule ./lib/TestDisplayModule.so
+mlbClockComponent TEAM          PHI

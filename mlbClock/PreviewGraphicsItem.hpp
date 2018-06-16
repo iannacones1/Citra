@@ -22,7 +22,7 @@ public:
 
     virtual QRectF boundingRect() const
     {
-        return QRectF(0, 0, 325, (QFontMetrics(mTeamName).height() + QFontMetrics(mTeamScore).height()) * 2);
+        return QRectF(0, 0, 425, (QFontMetrics(mTeamName).height() + QFontMetrics(mTeamScore).height()) * 2);
     }
 
     int width()  const { return boundingRect().width();  }
@@ -31,7 +31,6 @@ public:
     virtual void paint(QPainter* inPainter, const QStyleOptionGraphicsItem* /* Option */, QWidget* /* inWidget */)
     {
         int y = 0;
-//        inPainter->drawRect(boundingRect());
 
         BOOST_FOREACH(const team& aTeam, mGame.teams)
         {
@@ -40,7 +39,6 @@ public:
 
             {
                 QRectF rect(x, y, 125, QFontMetrics(mTeamName).height());
-//                inPainter->drawRect(rect);
                 inPainter->drawText(rect, Qt::AlignVCenter | Qt::AlignLeft, QString::fromStdString(aTeam.team_name));
                 x += rect.width();
             }
@@ -57,9 +55,8 @@ public:
             }
 
             {
-                QRectF rect(x, y, 200, QFontMetrics(mTeamName).height() + QFontMetrics(mTeamScore).height());
-                //                inPainter->drawRect(rect);
-                inPainter->setFont(QFont("lato", 16));
+                QRectF rect(x, y, 300, QFontMetrics(mTeamName).height() + QFontMetrics(mTeamScore).height());
+                inPainter->setFont(mPitcher);
                 inPainter->drawText(rect, Qt::AlignVCenter | Qt::AlignRight, QString::fromStdString(ss.str()));
             }
 
@@ -68,7 +65,6 @@ public:
             {
                 inPainter->setFont(mTeamScore);
                 QRectF rect(0, y, 125, QFontMetrics(mTeamScore).height());
-//                inPainter->drawRect(rect);
                 inPainter->drawText(rect, Qt::AlignVCenter | Qt::AlignLeft, QString::fromStdString(aTeam.record()));
             }
 
@@ -77,7 +73,7 @@ public:
     }
 
 protected:
-    game mGame;
+    game  mGame;
     QFont mTeamName;
     QFont mPitcher;
     QFont mTeamScore;

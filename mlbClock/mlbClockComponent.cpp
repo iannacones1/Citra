@@ -5,7 +5,6 @@
 #include <boost/foreach.hpp>
 
 #include "XmlDataGrabber.hpp"
-#include <Display/EinkDisplay.h>
 
 #include "linescoreGraphicsItem.hpp"
 #include "PreviewGraphicsItem.hpp"
@@ -16,7 +15,10 @@ namespace Citra { namespace mlbClock {
 static const int W = Citra::Display::ImageBuffer::WIDTH;
 static const int H = Citra::Display::ImageBuffer::HEIGHT;
 
-mlbClockComponent::mlbClockComponent() : mShutdown(false) { }
+mlbClockComponent::mlbClockComponent()
+ : mShutdown(false),
+   mDisplay(DisplayModule)
+{ }
 
 mlbClockComponent::~mlbClockComponent() { }
 
@@ -33,24 +35,13 @@ unsigned char mask(const QColor& inColor)
     int breakVal = 255 * 3 / 2;
     
     return (val < breakVal ? 0x00 : 0xFF);
-    //return (inColor != Qt::white ? 0x00 : 0xFF);
-    //return (inColor == Qt::black ? 0x00 : 0xFF);
 }
 
 void mlbClockComponent::run()
 {
-//    int z = 0;
-
-    Display::EinkDisplay epd;
-    if (!epd.initialize())
-    {
-        std::cerr << "e-Paper init failed" << std::endl;
-        return;
-    }
-
     while (!mShutdown)
     {
-        std::vector<game> games = DataGrabber::getGames("PHI");
+        std::vector<game> games = DataGrabber::getGames(TEAM);
 
         size_t focalGame = (games.at(2).status == "Preview" ? 1 : 2);
 
@@ -80,12 +71,12 @@ void mlbClockComponent::run()
         for (size_t i = 0; i < games.size(); i++)
         {
             int offset = (i > focalGame ? 1 : 0);
-            scene->addItem(new daySummaryGraphicsItem((W/5) * i - offset, 0, games.at(i), i != focalGame));
+            scene->addItem(new daySummaryGraphicsItem((W/5) * i - offset, 0, games.at(i), TEAM, i != focalGame));
         }
 
         if (cGame.status == "Preview"  ||
-                cGame.status == "Pre-Game" ||
-                cGame.status == "Warmup")
+            cGame.status == "Pre-Game" ||
+            cGame.status == "Warmup")
         {
             PreviewGraphicsItem* aLinescore = new PreviewGraphicsItem(cGame);
             aLinescore->setPos(W/2, H/2);
@@ -135,7 +126,7 @@ void mlbClockComponent::run()
             }
         }
 
-        epd.display(aImgBuf);
+        mDisplay->display(aImgBuf);
 
         if (cGame.status != "In Progress")
         {

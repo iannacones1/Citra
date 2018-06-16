@@ -11,7 +11,7 @@ static const int BOX_HEIGHT = BOX_WIDTH * 0.75;
 class daySummaryGraphicsItem : public QGraphicsItem
 {
   public:
-    daySummaryGraphicsItem(int x, int y, const game& inGame, bool inFrame = true) : mGame(inGame), mFrame(inFrame)
+    daySummaryGraphicsItem(int x, int y, const game& inGame, const std::string& inTeam, bool inFrame = true) : mGame(inGame), mTeam(inTeam), mFrame(inFrame)
     {
         this->setPos(x,y);
     }
@@ -55,7 +55,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
 
             if (mGame.status == "Final")
             {
-                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.finalScore("PHI")));
+                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.finalScore(mTeam)));
             }
             else if (mGame.status == "In Progress")
             {
@@ -63,7 +63,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
             }
             else
             {
-                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.teamTime("PHI")));
+                inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.teamTime(mTeam)));
             }
 
         }
@@ -72,7 +72,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
 
         inPainter->setFont(QFont("lato", 22));
 
-        if (mGame.home().isNamed("PHI"))
+        if (mGame.home().isNamed(mTeam))
         {
             inPainter->drawText(rect, Qt::AlignCenter, QString::fromStdString(mGame.away().name_abbrev));
         }
@@ -86,6 +86,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
 
 protected:
     game mGame;
+    std::string mTeam;
     bool mFrame;
 };
 
