@@ -1,10 +1,6 @@
-#include <iostream>
-#include <iterator>
-#include <sstream>
-#include <string>
-#include <vector>
-
 #include "CommandLineConfigurator.h"
+
+#include <Language/Exception.hpp>
 
 namespace Citra { namespace Configurable {
 
@@ -46,9 +42,8 @@ std::string CommandLineConfigurator::getValue(const std::string& inClassName, co
             return aConfig.Value;
         }
     }
-    std::stringstream ss;
-    ss << "CommandLineConfigurator unknown configuration " << inClassName << "::" << inConfigName;
-    throw std::runtime_error(ss.str());
+
+    THROW_RUNTIME_EXCEPTION("CommandLineConfigurator unknown configuration " << inClassName << "::" << inConfigName);
 }
 
 

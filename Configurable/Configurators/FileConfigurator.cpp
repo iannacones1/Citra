@@ -1,11 +1,11 @@
+#include "FileConfigurator.h"
+
+#include <Language/Exception.hpp>
+
 #include <iostream>
 #include <iterator>
 #include <sstream>
-#include <string>
 #include <vector>
-#include <stdexcept>
-
-#include "FileConfigurator.h"
 
 namespace Citra { namespace Configurable {
 
@@ -55,9 +55,8 @@ std::string FileConfigurator::getValue(const std::string& inClassName, const std
             return aConfig.Value;
         }
     }
-    std::stringstream ss;
-    ss << "FileConfigurator unknown configuration " << inClassName << "::" << inConfigName;
-    throw std::runtime_error(ss.str());
+
+    THROW_RUNTIME_EXCEPTION("FileConfigurator unknown configuration " << inClassName << "::" << inConfigName);
 }
 
 

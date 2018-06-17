@@ -1,5 +1,4 @@
-#ifndef _XML_DATA_GRABBER_HPP_
-#define _XML_DATA_GRABBER_HPP_
+#include "mlbDataNames.hpp"
 
 #include <Language/Exception.hpp>
 #include <mlbClock/Interfaces/iMlbDataGrabber.h>
@@ -15,16 +14,6 @@
 #include <rapidxml>
 
 namespace Citra { namespace mlbClock {
-
-static const char* GAMES = "games";
-static const char* GAME  = "game";
-
-static const char* LINESCORE  = "linescore";
-static const char* INNING     = "inning";
-
-static const char* RUNS   = "r";
-static const char* HITS   = "h";
-static const char* ERRORS = "e";
 
 static const char* DAY     = "day";
 static const char* STATUS  = "status";
@@ -291,8 +280,7 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
 
             if (!aRootNode)
             {
-                std::stringstream ss; ss << "FILE ERROR: '" << aFileName << "' missing root tag <" << GAMES << ">";
-                throw Language::Exception(ss);
+                THROW_RUNTIME_EXCEPTION("FILE ERROR: '" << aFileName << "' missing root tag <" << GAMES << ">");
             }
 
             std::list<mlbGame> results;
@@ -311,5 +299,3 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
 MODULE(Interfaces::iMlbDataGrabber, XmlDataGrabber)
 
 } /* namespace mlbClock */ } /* namespace Citra */
-
-#endif /* _XML_DATA_GRABBER_HPP_ */
