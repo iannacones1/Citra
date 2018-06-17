@@ -30,3 +30,10 @@ sudo mv rapidxml /usr/include/
 
 - clone Citra
  git clone https://github.com/iannacones1/Citra.git
+
+
+# I have x11 issues running as root (only on zero, it was a "thin
+" install?)
+xauth list | grep unix`echo $DISPLAY | cut -c10-12` > /tmp/xauth
+sudo su
+xauth add `cat /tmp/xauth`
