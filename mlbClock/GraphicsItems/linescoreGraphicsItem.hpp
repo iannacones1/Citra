@@ -12,7 +12,7 @@ namespace Citra { namespace mlbClock {
 class linescoreGraphicsItem : public QGraphicsItem
 {
 public:
-    linescoreGraphicsItem(const game& inGame) : mGame(inGame), mInningCount(std::max(mGame.away().innings.size(), (size_t)9)) { }
+    linescoreGraphicsItem(const mlbGame& inGame) : mGame(inGame), mInningCount(std::max(mGame.away().innings.size(), (size_t)9)) { }
     virtual ~linescoreGraphicsItem() { }
 
     virtual QRectF boundingRect() const
@@ -74,7 +74,7 @@ public:
             inPainter->drawRect(rect);
         }
 
-        BOOST_FOREACH(const team& aTeam, mGame.teams)
+        BOOST_FOREACH(const mlbTeam& aTeam, mGame.teams)
         {
             x = 0;
 
@@ -236,7 +236,7 @@ public:
     }
 
 protected:
-    game mGame;
+    mlbGame mGame;
     size_t mInningCount;
 };
 

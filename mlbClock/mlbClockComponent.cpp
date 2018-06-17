@@ -4,11 +4,9 @@
 #include <unistd.h>
 #include <boost/foreach.hpp>
 
-#include "XmlDataGrabber.hpp"
-
-#include "linescoreGraphicsItem.hpp"
-#include "PreviewGraphicsItem.hpp"
-#include "daySummaryGraphicsItem.hpp"
+#include <mlbClock/GraphicsItems/linescoreGraphicsItem.hpp>
+#include <mlbClock/GraphicsItems/PreviewGraphicsItem.hpp>
+#include <mlbClock/GraphicsItems/daySummaryGraphicsItem.hpp>
 
 namespace Citra { namespace mlbClock {
 
@@ -17,6 +15,7 @@ static const int H = Citra::Display::ImageBuffer::HEIGHT;
 
 mlbClockComponent::mlbClockComponent()
  : mShutdown(false),
+   mDataGrabber(DataGrabber),
    mDisplay(DisplayModule)
 { }
 
@@ -41,11 +40,11 @@ void mlbClockComponent::run()
 {
     while (!mShutdown)
     {
-        std::vector<game> games = DataGrabber::getGames(TEAM);
+        std::vector<mlbGame> games = mDataGrabber->getGames(TEAM);
 
         size_t focalGame = (games.at(2).status == "Preview" ? 1 : 2);
 
-        game cGame = games.at(focalGame);
+        mlbGame cGame = games.at(focalGame);
 
         QGraphicsScene* scene = new QGraphicsScene(0, 0, W, H);
 

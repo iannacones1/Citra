@@ -34,20 +34,21 @@ void CommandLineConfigurator::addData(int argc, char* argv[])
 
 void CommandLineConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
 {
-    std::cout << "--" << inClassName << "::" << inConfigName << " = " << inType << std::endl;
+    std::cout << " OPTION: --" << inClassName << "::" << inConfigName << " '" << inType << "'" << std::endl;
 }
 
 std::string CommandLineConfigurator::getValue(const std::string& inClassName, const std::string& inConfigName)
 {
     for (const Configuration& aConfig : mConfigurations)
     {
-        if (aConfig.Name == inClassName + "::" + inConfigName)
+        if (aConfig.Name == "--" + inClassName + "::" + inConfigName)
         {
             return aConfig.Value;
         }
     }
-    std::cerr << "CommandLineConfigurator unknown configuration " << inClassName << "::" << inConfigName << std::endl;
-    throw;
+    std::stringstream ss;
+    ss << "CommandLineConfigurator unknown configuration " << inClassName << "::" << inConfigName;
+    throw std::runtime_error(ss.str());
 }
 
 
@@ -57,7 +58,7 @@ std::list<std::string> CommandLineConfigurator::getValues(const std::string& inC
 
     for (const Configuration& aConfig : mConfigurations)
     {
-        if (aConfig.Name == inClassName + "::" + inConfigName)
+        if (aConfig.Name == "--" + inClassName + "::" + inConfigName)
         {
             aResult.push_back(aConfig.Value);
         }

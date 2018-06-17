@@ -27,15 +27,21 @@ class IConfigurator
             if (mHelp)
             {
                 help(inClassName, inConfigName, Language::Demangler::demangle(ioValue));
+                for (const std::string& aValue : getValues(inClassName, inConfigName))
+                {
+                    ioValue.push_back(boost::lexical_cast<T>(aValue));
+                }
             }
-
-            std::cout << "Configure " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = ";
-            for (const std::string& aValue : getValues(inClassName, inConfigName))
+            else
             {
-                std::cout << aValue << " ";
-                ioValue.push_back(boost::lexical_cast<T>(aValue));
+                std::cout << "Configure " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = ";
+                for (const std::string& aValue : getValues(inClassName, inConfigName))
+                {
+                    std::cout << aValue << " ";
+                    ioValue.push_back(boost::lexical_cast<T>(aValue));
+                }
+                std::cout << std::endl;
             }
-            std::cout << std::endl;
         }
 
         template<typename T>
@@ -49,10 +55,7 @@ class IConfigurator
                 {
                     ioValue = boost::lexical_cast<T>(getValue(inClassName, inConfigName));
                 }
-                catch(const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                }
+                catch(...) { }
             }
             else
             {

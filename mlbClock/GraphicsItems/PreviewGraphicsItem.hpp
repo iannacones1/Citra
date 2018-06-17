@@ -11,7 +11,7 @@ namespace Citra { namespace mlbClock {
 class PreviewGraphicsItem : public QGraphicsItem
 {
 public:
-    PreviewGraphicsItem(const game& inGame) : mGame(inGame)
+    PreviewGraphicsItem(const mlbGame& inGame) : mGame(inGame)
     {
         mTeamName = QFont("lato", 16, QFont::Bold);
         mPitcher = QFont("lato", 16);
@@ -32,7 +32,7 @@ public:
     {
         int y = 0;
 
-        BOOST_FOREACH(const team& aTeam, mGame.teams)
+        BOOST_FOREACH(const mlbTeam& aTeam, mGame.teams)
         {
             int x = 0;
             inPainter->setFont(mTeamName);
@@ -73,7 +73,7 @@ public:
     }
 
 protected:
-    game  mGame;
+    mlbGame  mGame;
     QFont mTeamName;
     QFont mPitcher;
     QFont mTeamScore;

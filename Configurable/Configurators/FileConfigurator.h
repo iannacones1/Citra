@@ -13,6 +13,8 @@ class FileConfigurator : public IConfigurator
         FileConfigurator(int argc, char* argv[], const std::string& inConfigFile);
         virtual ~FileConfigurator();
 
+        virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType);
+
     protected:
         struct Configuration
         {

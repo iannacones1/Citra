@@ -86,6 +86,7 @@ bool EinkDisplay::initialize()
 
 void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 {
+    //TODO: the filtering logic here should be in the module
     if (inImageBuffer == mCurrentBuffer)
     {
         return;

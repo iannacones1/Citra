@@ -11,7 +11,7 @@ static const int BOX_HEIGHT = BOX_WIDTH * 0.75;
 class daySummaryGraphicsItem : public QGraphicsItem
 {
   public:
-    daySummaryGraphicsItem(int x, int y, const game& inGame, const std::string& inTeam, bool inFrame = true) : mGame(inGame), mTeam(inTeam), mFrame(inFrame)
+    daySummaryGraphicsItem(int x, int y, const mlbGame& inGame, const std::string& inTeam, bool inFrame = true) : mGame(inGame), mTeam(inTeam), mFrame(inFrame)
     {
         this->setPos(x,y);
     }
@@ -85,7 +85,7 @@ class daySummaryGraphicsItem : public QGraphicsItem
     }
 
 protected:
-    game mGame;
+    mlbGame mGame;
     std::string mTeam;
     bool mFrame;
 };

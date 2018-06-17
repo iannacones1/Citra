@@ -41,6 +41,11 @@ void FileConfigurator::addFileData(const std::string& inConfigFile)
     }
 }
 
+void FileConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
+{
+    std::cout << " OPTION: " << inClassName << " " << inConfigName << " '" << inType << "'" << std::endl;
+}
+
 std::string FileConfigurator::getValue(const std::string& inClassName, const std::string& inConfigName)
 {
     for (const Configuration& aConfig : mConfigurations)
@@ -52,7 +57,6 @@ std::string FileConfigurator::getValue(const std::string& inClassName, const std
     }
     std::stringstream ss;
     ss << "FileConfigurator unknown configuration " << inClassName << "::" << inConfigName;
-    std::cerr << ss.str() << std::endl;
     throw std::runtime_error(ss.str());
 }
 

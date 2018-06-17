@@ -1,14 +1,14 @@
 #ifndef _MLB_CLOCK_COMPONENT_H_
 #define _MLB_CLOCK_COMPONENT_H_
 
+#include <mlbClock/Interfaces/iMlbDataGrabber.h>
+#include <Display/Interfaces/iBufferDisplay.h>
+#include <Module/Module.hpp>
+#include <Configurable/Configurable.hpp>
+
 #include <string>
 
 #include <QtGui/QtGui>
-
-#include <Display/Interfaces/iBufferDisplay.h>
-
-#include <Module/Module.hpp>
-#include <Configurable/Configurable.hpp>
 
 namespace Citra { namespace mlbClock {
 
@@ -27,6 +27,7 @@ class mlbClockComponent
 
         CONFIGURABLE
         (
+            (std::string) DataGrabber,
             (std::string) DisplayModule,
             (std::string) TEAM
         )
@@ -34,6 +35,7 @@ class mlbClockComponent
         INITIALIZE(mlbClockComponent)
 
         bool mShutdown;
+        Module<Interfaces::iMlbDataGrabber> mDataGrabber;
         Module<Display::Interfaces::iBufferDisplay> mDisplay;
 };
 
