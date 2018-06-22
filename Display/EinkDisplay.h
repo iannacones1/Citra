@@ -8,6 +8,9 @@ namespace Citra { namespace Display {
 class EinkDisplay
 {
   public:
+    static const int WIDTH  = 640;
+    static const int HEIGHT = 384;
+
     EinkDisplay();
     virtual ~EinkDisplay();
 

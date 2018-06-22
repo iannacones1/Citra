@@ -3,31 +3,39 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 namespace Citra { namespace Display {
 
 class ImageBuffer
 {
   public:
-    static const int WIDTH  = 640;
-    static const int HEIGHT = 384;
-
-    ImageBuffer(unsigned char inVal = 0x00)
-     : mData(HEIGHT * WIDTH/2, inVal)
+    ImageBuffer(int inWidth, int inHeight, unsigned char inVal = 0x00)
+     : mWidth(inWidth),
+       mHeight(inHeight),
+       mData(mHeight * mWidth, inVal)
     { }
 
     ImageBuffer(const ImageBuffer& inImageBuffer)
-     : mData()
+    : mWidth(inImageBuffer.mWidth),
+      mHeight(inImageBuffer.mHeight),
+      mData(mHeight * mWidth)
     {
-        mData.resize(inImageBuffer.mData.size());
         std::copy(inImageBuffer.mData.begin(), inImageBuffer.mData.end(), mData.begin());
     }
 
     virtual ~ImageBuffer() { }
 
+    int width() const { return mWidth; }
+    int height() const { return mHeight; }
+    int length() const { return mData.size(); }
+
     bool operator==(const ImageBuffer& inImageBuffer) const
     {
         bool is_equal = inImageBuffer.mData.size() == this->mData.size();
+
+        is_equal &= mWidth  == inImageBuffer.mWidth;
+        is_equal &= mHeight == inImageBuffer.mHeight;
 
         for (size_t i = 0; i < mData.size(); i++)
         {
@@ -37,11 +45,14 @@ class ImageBuffer
         return is_equal;
     }
 
-    int length() const { return mData.size(); }
-
     void set(int inW, int inH, unsigned char inVal)
     {
-        mData[inH * WIDTH/2 + inW] = inVal;
+        mData.at(inH * mWidth + inW) = inVal;
+    }
+
+    unsigned char at(int inW, int inH) const
+    {
+        return mData.at(inH * mWidth + inW);
     }
 
     unsigned char at(int inLocation) const
@@ -49,6 +60,9 @@ class ImageBuffer
         return mData.at(inLocation);
     }
 
+  protected:
+    int mWidth;
+    int mHeight;
     std::vector< unsigned char > mData;
 };
 

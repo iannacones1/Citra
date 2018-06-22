@@ -24,7 +24,7 @@ static const unsigned char TCON_SETTING                   = 0x60;
 static const unsigned char TCON_RESOLUTION                = 0x61;
 static const unsigned char VCM_DC_SETTING                 = 0x82;
 
-EinkDisplay::EinkDisplay() : mCurrentBuffer(0x00) { }
+EinkDisplay::EinkDisplay() : mCurrentBuffer(WIDTH, HEIGHT, 0x00) { }
 
 EinkDisplay::~EinkDisplay() { }
 
@@ -77,7 +77,7 @@ bool EinkDisplay::initialize()
     sendCommand(POWER_ON);
     waitUntilIdle();
 
-    Citra::Display::ImageBuffer resetBuffer(0x33);
+    Citra::Display::ImageBuffer resetBuffer(WIDTH, HEIGHT, 0x33);
 
     display(resetBuffer);
 
@@ -86,7 +86,7 @@ bool EinkDisplay::initialize()
 
 void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 {
-    //TODO: the filtering logic here should be in the module
+    //TODO: the filtering logic here should be in the EinkModule
     if (inImageBuffer == mCurrentBuffer)
     {
         return;
@@ -94,16 +94,29 @@ void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 
     sendCommand(DATA_START_TRANSMISSION_1);
 
-    for(int i = 0; i < inImageBuffer.length(); i++)
+    for(int i = 0; i < inImageBuffer.length(); i += 2)
     {
+        unsigned char d = 0x00;
+
         if (inImageBuffer.at(i) == mCurrentBuffer.at(i))
         {
-            sendData(0x66);
+            d |= 0x60;
         }
         else
         {
-            sendData(inImageBuffer.at(i));
+            d |= 0x30 & inImageBuffer.at(i);
         }
+
+        if (inImageBuffer.at(i+1) == mCurrentBuffer.at(i+1))
+        {
+            d |= 0x06;
+        }
+        else
+        {
+            d |= 0x03 & inImageBuffer.at(i+1);
+        }
+
+        sendData(d);
     }
 
     sendCommand(DISPLAY_REFRESH);

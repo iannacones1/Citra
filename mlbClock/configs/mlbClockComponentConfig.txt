@@ -1,4 +1,4 @@
 mlbClockComponent DisplayModule ./lib/EinkDisplayModule.so
-#mlbClockComponent DisplayModule ./lib/TestDisplayModule.so
+mlbClockComponent ImageBuilder  ./lib/QtMlbImageBuilder.so
 mlbClockComponent DataGrabber   ./lib/XmlDataGrabber.so
 mlbClockComponent TEAM          PHI

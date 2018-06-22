@@ -2,13 +2,12 @@
 #define _MLB_CLOCK_COMPONENT_H_
 
 #include <mlbClock/Interfaces/iMlbDataGrabber.h>
+#include <mlbClock/Interfaces/iMlbImageBuilder.h>
 #include <Display/Interfaces/iBufferDisplay.h>
 #include <Module/Module.hpp>
 #include <Configurable/Configurable.hpp>
 
 #include <string>
-
-#include <QtGui/QtGui>
 
 namespace Citra { namespace mlbClock {
 
@@ -22,12 +21,10 @@ class mlbClockComponent
         void shutdown();
 
     protected:
-        void addText(int& x, int& y, const QString& inText,     QGraphicsScene* scene);
-        void addText(int& x, int& y, const std::string& inText, QGraphicsScene* scene);
-
         CONFIGURABLE
         (
             (std::string) DataGrabber,
+            (std::string) ImageBuilder,
             (std::string) DisplayModule,
             (std::string) TEAM
         )
@@ -36,6 +33,7 @@ class mlbClockComponent
 
         bool mShutdown;
         Module<Interfaces::iMlbDataGrabber> mDataGrabber;
+        Module<Interfaces::iMlbImageBuilder> mImageBuilder;
         Module<Display::Interfaces::iBufferDisplay> mDisplay;
 };
 

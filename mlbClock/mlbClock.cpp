@@ -1,8 +1,6 @@
 #include <iostream>
 #include <csignal>
 
-#include <QtGui/QtGui>
-
 #include <mlbClock/mlbClockComponent.h>
 
 #include <Configurable/Configurators/FileConfigurator.h>
@@ -18,8 +16,6 @@ void signalHandler(int /* inSigNum */)
 int main(int argc, char* argv[])
 {
 	signal(SIGINT, signalHandler);
-
-    QApplication app(argc, argv);
 
     std::cout << "Running " << argv[0] << std::endl;
 

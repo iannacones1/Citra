@@ -13,7 +13,6 @@ namespace Citra { namespace mlbClock { namespace Interfaces {
 class iMlbDataGrabber
 {
     public:
-        iMlbDataGrabber() { }
         virtual ~iMlbDataGrabber() { }
 
         virtual std::list<mlbGame> getGameList(int inYear, int inMonth, int inDay) = 0;
@@ -49,7 +48,8 @@ class iMlbDataGrabber
 
             return outGames;
         }
-
+    protected:
+        iMlbDataGrabber() { }
 };
 
 } /* namespace Interfaces*/ } /* namespace mlbClock */ } /* namespace Citra */
