@@ -50,6 +50,11 @@ class ImageBuffer
         mData.at(inH * mWidth + inW) = inVal;
     }
 
+    void set(int inLocation, unsigned char inVal)
+    {
+        mData.at(inLocation) = inVal;
+    }
+
     unsigned char at(int inW, int inH) const
     {
         return mData.at(inH * mWidth + inW);

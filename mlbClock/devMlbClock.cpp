@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
 
     Citra::Module<Citra::mlbClock::Interfaces::iMlbDataGrabber> mDataGrabber("./lib/XmlDataGrabber.so");
-    Citra::Module<Citra::mlbClock::Interfaces::iMlbImageBuilder> mImageBuilder("./lib/QtMlbImageBuilder.so");
+    Citra::Module<Citra::mlbClock::Interfaces::iMlbImageBuilder> mImageBuilder("./lib/CairoMlbImageBuilder.so");
 
     std::vector<Citra::mlbClock::mlbGame> games = mDataGrabber->getGames("PHI");
 

@@ -4,6 +4,7 @@ DEV_CLOCK_OBJS := $(OBJ_DIR)devMlbClock.o
 MLB_CLOCK_MODS := $(patsubst %.cpp, %.so, $(wildcard $(CLOCK_MODS_DIR)*.cpp))
 
 QT_INCLUDE := -I/usr/include/qt4/
+CAIRO_INCLUDE := -I/usr/include/cairo/ -I/usr/include/cairomm-1.0/
 
 mlbClock: $(CONFIGURABLE_OBJS) $(MLB_CLOCK_OBJS) $(MLB_CLOCK_MODS)
 	mkdir -p $(BIN_DIR)	
@@ -27,6 +28,6 @@ $(OBJ_DIR)devMlbClock.o: mlbClock/devMlbClock.cpp
 
 $(CLOCK_MODS_DIR)%.so: $(CLOCK_MODS_DIR)%.cpp
 	mkdir -p $(LIB_DIR)
-	$(CC) $(QT_INCLUDE) $(MFLAGS) $(LIB_DIR)$(notdir $@) $< -lQtGui -lQtCore
+	$(CC) $(QT_INCLUDE) $(CAIRO_INCLUDE) $(MFLAGS) $(LIB_DIR)$(notdir $@) $< -lQtGui -lQtCore -lcairo
 	
 ALL += mlbClock $(MLB_CLOCK_OBJS) $(MLB_CLOCK_MODS) devMlbClock $(DEV_CLOCK_OBJS)
