@@ -26,7 +26,18 @@ void mlbClockComponent::run()
     {
         std::vector<mlbGame> games = mDataGrabber->getGames(TEAM);
 
-        size_t focalGame = (games.at(2).status == "Preview" ? 1 : 2);
+        size_t focalGame = games.size() - 1;
+
+        for (; focalGame > 0; focalGame--)
+        {
+
+            if (games.at(focalGame).status == "Preview" ||
+                games.at(focalGame).status == "In Progress" ||
+                games.at(focalGame).status == "Delay")
+            {
+                break;
+            }
+        }
 
         mlbGame cGame = games.at(focalGame);
 
@@ -34,7 +45,7 @@ void mlbClockComponent::run()
 
         mDisplay->display(aImgBuf);
 
-        sleep(cGame.status != "In Progress" ? 60 : 1);
+        sleep(cGame.status != "In Progress" ? 60 : 10);
     }
 }
 

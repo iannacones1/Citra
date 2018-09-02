@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     {
         for (int x = 0; x < aImgBuf.width(); x++)
         {
-            aImage.setPixel(x, y, (aImgBuf.at(x,y) & 0xFF ? 1 : 0));
+            aImage.setPixel(x, y, (aImgBuf.at(x,y) & 0xFF ? 0 : 1));
         }
     }
 

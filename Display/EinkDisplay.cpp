@@ -47,35 +47,46 @@ bool EinkDisplay::initialize()
     bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);    //enable cs0
 
     reset();
+
     sendCommand(POWER_SETTING);
     sendData(0x37);
     sendData(0x00);
+
     sendCommand(PANEL_SETTING);
     sendData(0xCF);
     sendData(0x08);
+
     sendCommand(BOOSTER_SOFT_START);
     sendData(0xC7);
     sendData(0xCC);
     sendData(0x28);
+
+    sendCommand(POWER_ON);
+    waitUntilIdle();
+
     sendCommand(PLL_CONTROL);
     sendData(0x3C);
+
     sendCommand(TEMPERATURE_CALIBRATION);
     sendData(0x00);
+
     sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
     sendData(0x77);
+
     sendCommand(TCON_SETTING);
     sendData(0x22);
+
     sendCommand(TCON_RESOLUTION);
     sendData(0x02);              //source 640
     sendData(0x80);
     sendData(0x01);              //gate 384
     sendData(0x80);
+
     sendCommand(VCM_DC_SETTING);
     sendData(0x1E);              //decide by LUT file
+
     sendCommand(0xE5);           //FLASH MODE
     sendData(0x03);
-    sendCommand(POWER_ON);
-    waitUntilIdle();
 
     Citra::Display::ImageBuffer resetBuffer(WIDTH, HEIGHT, 0x33);
 
@@ -96,23 +107,24 @@ void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 
     for(int i = 0; i < inImageBuffer.length(); i += 2)
     {
+        bool invert = true;
         unsigned char d = 0x00;
 
-        if (inImageBuffer.at(i) == mCurrentBuffer.at(i))
+        if (invert)
         {
-            d |= 0x60;
+            if (inImageBuffer.at(i) == 0x00)
+            {
+                d |= 0x30;
+            }
+
+            if (inImageBuffer.at(i+1) == 0x00)
+            {
+                d |= 0x03;
+            }
         }
         else
         {
             d |= 0x30 & inImageBuffer.at(i);
-        }
-
-        if (inImageBuffer.at(i+1) == mCurrentBuffer.at(i+1))
-        {
-            d |= 0x06;
-        }
-        else
-        {
             d |= 0x03 & inImageBuffer.at(i+1);
         }
 
@@ -157,7 +169,7 @@ void EinkDisplay::waitUntilIdle()
     while (!bcm2835_gpio_lev(BUSY_PIN)) // 0: busy, 1: idle
     {
         bcm2835_delay(100);
-    }      
+    }
 }
 
 void EinkDisplay::reset()
