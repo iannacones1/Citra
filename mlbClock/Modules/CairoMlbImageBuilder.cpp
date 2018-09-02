@@ -187,11 +187,13 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
     unsigned char mask(unsigned char* inColor)
     {
-        int val = inColor[0] + inColor[1] + inColor[2] + inColor[3];
+        int alpha = inColor[0];
+//        int color = inColor[1] + inColor[2] + inColor[3];
 
+        // half of 255 cause everthing is showing up in alpha
         int breakVal = 255 / 2;
 
-        return (*aVal < breakVal ? 0x00 : 0xFF);
+        return (alpha < breakVal ? 0x00 : 0xFF);
     }
 
     virtual Display::ImageBuffer buildImage(const std::string& inTeam, const std::vector<mlbGame>& inGameList)
