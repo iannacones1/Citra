@@ -48,11 +48,9 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
     void addDaySummary(cairo_t* inCairo, int X, int Y, const mlbGame& inGame, const std::string& inTeam, bool inFocal)
     {
-        std::cout << "X=" << X << " Y=" << Y << " " << inTeam << " " << inFocal << std::endl;
-
         cairo_rectangle(inCairo, X, Y, BOX_WIDTH, (inFocal ? 0 : BOX_HEIGHT));
 
-        cairo_set_font_size(inCairo, 14);
+        cairo_set_font_size(inCairo, 16);
 
         { // DAY (Top Left)
             cairo_text_extents_t extents;
@@ -75,11 +73,11 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         { // Score / Time (Bottom Middle)
             std::string aText = inGame.teamTime(inTeam);
 
-            if (inGame.status == "Final")
+            if (inGame.isOver())
             {
                 aText = inGame.finalScore(inTeam);
             }
-            else if (inGame.status == "In Progress")
+            else if (inGame.inProgress())
             {
                 aText = "LIVE";
             }
@@ -100,10 +98,26 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         }
     }
 
+    void addDiamond(cairo_t* inCairo, int x, int y, int r, bool inFill)
+    {
+        cairo_move_to(inCairo, x    , y + r);
+        cairo_line_to(inCairo, x + r, y    );
+        cairo_line_to(inCairo, x    , y - r);
+        cairo_line_to(inCairo, x - r, y    );
+        cairo_close_path(inCairo);
+
+        if (inFill)
+        {
+            cairo_fill_preserve(inCairo);
+        }
+
+        cairo_stroke(inCairo); // Drawls all the lines?
+    }
+
     void addLinescore(cairo_t* inCairo, const mlbGame& inGame)
     {
         int X = W/2;
-        int Y = H/2;
+        int Y = H/3 + FONT_HEIGHT;
 
         size_t aInningCount = std::max(inGame.away().innings.size(), (size_t)9);
 
@@ -116,10 +130,11 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             X -= w/2; // Center X
         }
 
-        int x = X + SPACEING * 1.5;
+        int x = X + SPACEING * 2;
         int y = Y;
 
-        cairo_set_font_size(inCairo, 14);
+        cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size(inCairo, 18);
 
         for (size_t i = 0; i < aInningCount; i++)
         {
@@ -136,13 +151,17 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         centerText(inCairo, x, y, "H"); x += SPACEING;
         centerText(inCairo, x, y, "E"); x += SPACEING;
 
-        // draw "box"
-//        if (inGame.inning && inGame.inning_state && (inGame.inning_state.get() == "Top" || inGame.inning_state.get() == "Bottom"))
-//        {
-//            int yLoc = (inGame.inning_state.get() == "Top" ? y : y + FONT_HEIGHT);
-//            QRectF rect(SPACEING * 1.5 + (SPACEING * (inGame.inning.get() - 1)), yLoc, SPACEING, FONT_HEIGHT);
-//            inPainter->drawRect(rect);
-//        }
+        cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+
+        // draw "box" for current inning
+        if (inGame.inning && inGame.inning_state && (inGame.inning_state.get() == "Top" || inGame.inning_state.get() == "Bottom"))
+        {
+            int xLoc = X + SPACEING * 2 + (SPACEING * (inGame.inning.get() - 1) - SPACEING/2);
+            int yLoc = (inGame.inning_state.get() == "Top" ? Y : Y + FONT_HEIGHT) + FONT_HEIGHT/2;
+
+            cairo_rectangle(inCairo, xLoc, yLoc, SPACEING, FONT_HEIGHT);
+            cairo_stroke(inCairo); // Drawls all the lines?
+        }
 
         y += FONT_HEIGHT;
 
@@ -158,7 +177,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
                 cairo_show_text(inCairo, aTeam.name_abbrev.c_str());
             }
 
-            x += SPACEING * 1.5;
+            x += SPACEING * 2;
 
             for (size_t i = 0; i < aInningCount; i++)
             {
@@ -183,30 +202,115 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             y += FONT_HEIGHT;
         }
 
+        int h = FONT_HEIGHT * 3;
+
+        if (!inGame.isOver())
+        {
+            addDiamond(inCairo, x + h * 0.25, Y + h/2, h/4 - 4, inGame.runner_on_3b);
+            addDiamond(inCairo, x + h * 0.50, Y + h/4, h/4 - 4, inGame.runner_on_2b);
+            addDiamond(inCairo, x + h * 0.75, Y + h/2, h/4 - 4, inGame.runner_on_1b);
+
+            cairo_set_font_size(inCairo, 14);
+            centerText(inCairo, x + h/2, Y + FONT_HEIGHT * 2.5, inGame.BSO());
+        }
+
+        {
+            std::stringstream ss;
+
+            if (inGame.pitcher) { ss << "   P: "  << inGame.pitcher.get().Summary(); }
+            if (inGame.batter)  { ss << "   AB: " << inGame.batter.get().Summary(); }
+
+            if (inGame.pitcher || inGame.batter)
+            {
+                cairo_set_font_size(inCairo, 14);
+
+                cairo_text_extents_t extents;
+                cairo_text_extents(inCairo, ss.str().c_str(), &extents);
+
+                cairo_move_to(inCairo, X, y + extents.height/2);
+                cairo_show_text(inCairo, ss.str().c_str());
+
+                y += FONT_HEIGHT;
+            }
+        }
+
+        {
+            std::stringstream ss;
+
+            if (inGame.winning_pitcher) { ss << "   W: " << inGame.winning_pitcher.get().winSummary(); }
+            if (inGame.losing_pitcher)  { ss << "   L: " << inGame.losing_pitcher.get().winSummary();  }
+
+            if (inGame.winning_pitcher || inGame.losing_pitcher)
+            {
+                cairo_set_font_size(inCairo, 14);
+
+                cairo_text_extents_t extents;
+                cairo_text_extents(inCairo, ss.str().c_str(), &extents);
+
+                cairo_move_to(inCairo, X, y + extents.height/2);
+                cairo_show_text(inCairo, ss.str().c_str());
+
+                y += FONT_HEIGHT;
+            }
+        }
+
+        if (inGame.save_pitcher)
+        {
+            std::stringstream ss;
+            ss << "   S: " << inGame.save_pitcher.get().saveSummary();
+
+            cairo_set_font_size(inCairo, 14);
+
+            cairo_text_extents_t extents;
+            cairo_text_extents(inCairo, ss.str().c_str(), &extents);
+
+            cairo_move_to(inCairo, X, y + extents.height/2);
+            cairo_show_text(inCairo, ss.str().c_str());
+
+            y += FONT_HEIGHT;
+        }
+
+
     }
 
     unsigned char mask(unsigned char* inColor)
     {
-        int alpha = inColor[0];
-//        int color = inColor[1] + inColor[2] + inColor[3];
+        int color = inColor[2] + inColor[1] + inColor[0];
 
-        // half of 255 cause everthing is showing up in alpha
-        int breakVal = 255 / 2;
+        // half of 255x3(RGB)
+        int breakVal = 255 * 3 / 2;
 
-        return (alpha < breakVal ? 0x00 : 0xFF);
+        return (color < breakVal ? 0xFF : 0x00);
     }
 
     virtual Display::ImageBuffer buildImage(const std::string& inTeam, const std::vector<mlbGame>& inGameList)
     {
         std::cout << __func__ << " " << inTeam << std::endl;
 
-        size_t focalGame = (inGameList.at(2).status == "Preview" ? 1 : 2);
+        size_t focalGame = inGameList.size();
+        focalGame--;
+
+        while (focalGame > 0 && !inGameList.at(focalGame).inProgress())
+        {
+            focalGame--;
+        }
+
+        if (focalGame == 0 && !inGameList.at(focalGame).inProgress())
+        {
+            focalGame = (inGameList.at(2).status == "Preview" ? 1 : 2);
+        }
 
         mlbGame cGame = inGameList.at(focalGame);
 
         cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, W, H);
 
         cairo_t* aCairo = cairo_create(surface);
+
+        //Initialize the image to black transparent
+        cairo_set_source_rgba(aCairo, 1, 1, 1, 1);
+        cairo_paint(aCairo);
+
+        cairo_set_source_rgba(aCairo, 0, 0, 0, 1);
 
         cairo_select_font_face(aCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 
@@ -216,12 +320,30 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             addDaySummary(aCairo, (W/5) * i - offset, 0, inGameList.at(i), inTeam, i == focalGame);
         }
 
+        cairo_stroke(aCairo); // Drawls all the lines?
+
         // Game in progress
         addLinescore(aCairo, cGame);
 
-        cairo_stroke(aCairo); // Drawls all the lines?
+        // Paint home team image image
+            std::string aHomeTeamLogo = "../data/MLB/" + cGame.home().name_abbrev + ".png";
+            cairo_surface_t* aHomeTeamLogoSurface = cairo_image_surface_create_from_png(aHomeTeamLogo.c_str());
+            int hL_h = cairo_image_surface_get_height(aHomeTeamLogoSurface);
+
+            cairo_set_source_surface(aCairo, aHomeTeamLogoSurface, 0, H - hL_h);
+            cairo_paint(aCairo);
+
+        // Paint home team image image
+            std::string aAwayTeamLogo = "../data/MLB/" + cGame.away().name_abbrev + ".png";
+            cairo_surface_t* aAwayTeamLogoSurface = cairo_image_surface_create_from_png(aAwayTeamLogo.c_str());
+            int aL_w = cairo_image_surface_get_width(aAwayTeamLogoSurface);
+            int aL_h = cairo_image_surface_get_height(aAwayTeamLogoSurface);
+
+            cairo_set_source_surface(aCairo, aAwayTeamLogoSurface, W - aL_w, H - aL_h);
+            cairo_paint(aCairo);
 
         cairo_surface_flush(surface); // flush to ensure all writing to the image was done
+        cairo_destroy(aCairo);
 
         cairo_surface_write_to_png(surface, "test.png");
         unsigned char* data = cairo_image_surface_get_data(surface);
@@ -234,6 +356,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         }
 
         cairo_surface_destroy(surface);
+        cairo_surface_destroy(aHomeTeamLogoSurface);
 
         return aImgBuf;
     }

@@ -17,7 +17,7 @@ class EinkDisplay
     bool initialize();
     void display(const ImageBuffer& inImageBuffer);
 
-    void set(unsigned char inChar, int inNum);
+    void set(unsigned char inChar, int inNum = WIDTH * HEIGHT / 2);
   protected:
     void waitUntilIdle();
     void reset();
@@ -25,7 +25,7 @@ class EinkDisplay
     void sendData(unsigned char data);
     void sleep();
 
-    Citra::Display::ImageBuffer mCurrentBuffer;
+    bool mInit;
 };
 
 } /* namespace Display*/ } /* namespace Citra */

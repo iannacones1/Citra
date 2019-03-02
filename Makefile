@@ -20,6 +20,8 @@ include Configurable/Makefile
 include mlbClock/Makefile
 include Thermostat/Makefile
 
+include Test/Makefile
+
 all: $(ALL)
 
 clean:

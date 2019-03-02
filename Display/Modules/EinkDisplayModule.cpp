@@ -10,23 +10,33 @@ namespace Citra { namespace Display {
 class EinkDisplayModule : public Interfaces::iBufferDisplay
 {
     public:
-        EinkDisplayModule() : Interfaces::iBufferDisplay(), mDisplay()
-        {
-            if (!mDisplay.initialize())
-            {
-                std::cerr << "e-Paper init failed" << std::endl;
-                throw;
-            }
-        }
+        EinkDisplayModule() : Interfaces::iBufferDisplay(), mCurrentBuffer(EinkDisplay::WIDTH, EinkDisplay::HEIGHT, 0x33)
+        { }
 
         virtual ~EinkDisplayModule() { }
 
         virtual void display(const ImageBuffer& inBuffer)
         {
-            mDisplay.display(inBuffer);
+            // filtering logic
+            if (inBuffer == mCurrentBuffer)
+            {
+                return;
+            }
+
+            EinkDisplay aDisplay;
+
+            aDisplay.display(inBuffer);
+
+            if (!aDisplay.initialize())
+            {
+                std::cerr << "e-Paper init failed" << std::endl;
+                throw;
+            }
+
+            mCurrentBuffer = inBuffer;
         }
 
-        EinkDisplay mDisplay;
+        Citra::Display::ImageBuffer mCurrentBuffer;
 };
 
 MODULE(Interfaces::iBufferDisplay, EinkDisplayModule)

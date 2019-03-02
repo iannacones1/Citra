@@ -24,9 +24,15 @@ static const unsigned char TCON_SETTING                   = 0x60;
 static const unsigned char TCON_RESOLUTION                = 0x61;
 static const unsigned char VCM_DC_SETTING                 = 0x82;
 
-EinkDisplay::EinkDisplay() : mCurrentBuffer(WIDTH, HEIGHT, 0x00) { }
+EinkDisplay::EinkDisplay() : mInit(false) { }
 
-EinkDisplay::~EinkDisplay() { }
+EinkDisplay::~EinkDisplay()
+{
+    if (mInit)
+    {
+        sleep();
+    }
+}
 
 bool EinkDisplay::initialize()
 {
@@ -39,7 +45,12 @@ bool EinkDisplay::initialize()
     bcm2835_gpio_fsel(DC_PIN, BCM2835_GPIO_FSEL_OUTP);
     bcm2835_gpio_fsel(BUSY_PIN, BCM2835_GPIO_FSEL_INPT);
 
-    bcm2835_spi_begin();                                        //Start spi interface, set spi pin for the reuse function
+    //Start spi interface, set spi pin for the reuse function
+    if (!bcm2835_spi_begin())
+    {
+        return false;
+    }
+
     bcm2835_spi_setBitOrder(BCM2835_SPI_BIT_ORDER_MSBFIRST);    //High first transmission
     bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);                 //spi mode 0
     bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_128); //Frequency
@@ -88,24 +99,16 @@ bool EinkDisplay::initialize()
     sendCommand(0xE5);           //FLASH MODE
     sendData(0x03);
 
-    Citra::Display::ImageBuffer resetBuffer(WIDTH, HEIGHT, 0x33);
-
-    display(resetBuffer);
+    mInit = true;
 
     return true;
 }
 
 void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
 {
-    //TODO: the filtering logic here should be in the EinkModule
-    if (inImageBuffer == mCurrentBuffer)
-    {
-        return;
-    }
-
     sendCommand(DATA_START_TRANSMISSION_1);
 
-    for(int i = 0; i < inImageBuffer.length(); i += 2)
+    for (int i = 0; i < inImageBuffer.length(); i += 2)
     {
         bool invert = true;
         unsigned char d = 0x00;
@@ -134,8 +137,6 @@ void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
     sendCommand(DISPLAY_REFRESH);
     bcm2835_delay(100);
     waitUntilIdle();
-
-    mCurrentBuffer = inImageBuffer;
 }
 
 void EinkDisplay::set(unsigned char inChar, int inNum)
@@ -186,6 +187,8 @@ void EinkDisplay::sleep()
     waitUntilIdle();
     sendCommand(DEEP_SLEEP);
     sendData(0xa5);
+
+    mInit = false;
 }
 
 } /* namespace Display*/ } /* namespace Citra */

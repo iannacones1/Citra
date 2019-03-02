@@ -7,6 +7,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace Citra { namespace mlbClock {
 
@@ -132,7 +133,8 @@ struct mlbGame
         const mlbTeam& bTeam = (away().isNamed(inTeam) ? home() : away());
 
         std::stringstream ss;
-        ss << (aTeam.runs > bTeam.runs ? "W " : "L ");
+
+        ss << (aTeam.runs == bTeam.runs ? "T " : (aTeam.runs > bTeam.runs ? "W " : "L "));
         ss << aTeam.runs << "-" << bTeam.runs;
 
         return ss.str();
@@ -167,11 +169,19 @@ struct mlbGame
 
     bool isOver() const
     {
-        return status == "Final" || status == "Game Over";
+        return boost::starts_with(status, "Final") ||
+                   boost::starts_with(status, "Completed") ||
+                   status == "Game Over";
+    }
+
+    bool inProgress() const
+    {
+        return status == "In Progress";
     }
 
     std::vector<mlbTeam> teams;
     std::string Day;
+    std::string time_date;
     int num;
 
     int balls;
