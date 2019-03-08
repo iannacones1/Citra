@@ -20,7 +20,11 @@ include Configurable/Makefile
 include mlbClock/Makefile
 include Thermostat/Makefile
 
-include Test/Makefile
+httpClient: $(OBJ_DIR)httpClient.o
+	$(CC) $(FLAGS) $(OBJ_DIR)httpClient.o -o $(BIN_DIR)httpClient
+
+$(OBJ_DIR)httpClient.o: http_client_sync.cpp
+	$(CC) $(FLAGS) http_client_sync.cpp -o $(OBJ_DIR)httpClient.o
 
 all: $(ALL)
 

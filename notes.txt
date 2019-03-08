@@ -42,6 +42,13 @@ sudo cp -r rapidxml-1.13 /usr/include/
  echo "#include \"rapidxml-1.13/rapidxml.hpp\"" > rapidxml
 sudo mv rapidxml /usr/include/
 
+
+- install boost beast
+git clone https://github.com/boostorg/beast.git
+cd beast/
+sudo cp -r include/boost/beast /usr/include/boost/
+sudo cp include/boost/beast.hpp /usr/include/boost/
+
 - clone Citra
  git clone https://github.com/iannacones1/Citra.git
 

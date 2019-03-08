@@ -170,13 +170,20 @@ struct mlbGame
     bool isOver() const
     {
         return boost::starts_with(status, "Final") ||
-                   boost::starts_with(status, "Completed") ||
-                   status == "Game Over";
+               boost::starts_with(status, "Completed") ||
+               status == "Game Over";
     }
 
     bool inProgress() const
     {
-        return status == "In Progress";
+        return status == "In Progress" ||
+               status == "Delay";
+    }
+
+    bool isUpdating() const
+    {
+        return inProgress();// ||
+               //status == "Pre-Game";
     }
 
     std::vector<mlbTeam> teams;

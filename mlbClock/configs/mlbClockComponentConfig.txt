@@ -1,5 +1,5 @@
 mlbClockComponent DisplayModule ./lib/EinkDisplayModule.so
-mlbClockComponent ImageBuilder  ./lib/QtMlbImageBuilder.so
-#mlbClockComponent ImageBuilder  ./lib/CairoMlbImageBuilder.so
+#mlbClockComponent ImageBuilder  ./lib/QtMlbImageBuilder.so
+mlbClockComponent ImageBuilder  ./lib/CairoMlbImageBuilder.so
 mlbClockComponent DataGrabber   ./lib/XmlDataGrabber.so
 mlbClockComponent TEAM          PHI

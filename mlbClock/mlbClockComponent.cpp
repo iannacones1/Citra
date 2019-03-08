@@ -26,26 +26,19 @@ void mlbClockComponent::run()
     {
         std::vector<mlbGame> games = mDataGrabber->getGames(TEAM);
 
-        size_t focalGame = games.size() - 1;
-
-        for (; focalGame > 0; focalGame--)
-        {
-
-            if (games.at(focalGame).status == "Preview" ||
-                games.at(focalGame).status == "In Progress" ||
-                games.at(focalGame).status == "Delay")
-            {
-                break;
-            }
-        }
-
-        mlbGame cGame = games.at(focalGame);
-
         Citra::Display::ImageBuffer aImgBuf = mImageBuilder->buildImage(TEAM, games);
 
         mDisplay->display(aImgBuf);
 
-        sleep(cGame.status != "In Progress" ? 60 : 10);
+	bool inProgress = false;
+        for (const mlbGame& aGame : games)
+        {
+            inProgress |= aGame.isUpdating();
+        }
+
+        int durationSec = (inProgress ? 5 : 60);
+        std::cout << (inProgress ? "G" : "No g") << "ame in progress sleep(" << durationSec << ")" << std::endl;
+        sleep(durationSec);
     }
 }
 

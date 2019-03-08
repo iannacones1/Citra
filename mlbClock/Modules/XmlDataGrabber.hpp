@@ -257,9 +257,9 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
             std::string aFileName = ss.str();
 
             { // TODO: replace with non system call
-         //       std::string aCmd = "wget -p -q http://";
-         //       aCmd += aFileName;
-         //       system(aCmd.c_str());
+                std::string aCmd = "wget -p -q http://";
+                aCmd += aFileName;
+                system(aCmd.c_str());
             }
 
             return aFileName;

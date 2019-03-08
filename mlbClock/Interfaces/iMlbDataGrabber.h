@@ -24,27 +24,70 @@ class iMlbDataGrabber
                                inDate.day());
         }
 
+        void getGamesBefore(const boost::gregorian::date& inDay,
+                            const std::string& inTeam,
+                            std::list<mlbGame>& ioGames)
+        {
+            std::list<mlbGame> aGameList = this->getGameList(inDay);
+            std::reverse(aGameList.begin(), aGameList.end());
+
+            for (const mlbGame& aGame : aGameList)
+            {
+                if (aGame.containsTeam(inTeam))
+                {
+                    ioGames.push_front(aGame);
+                }
+            }
+
+        }
+
+        void getGamesAfter(const boost::gregorian::date& inDay,
+                            const std::string& inTeam,
+                            std::list<mlbGame>& ioGames)
+        {
+            std::list<mlbGame> aGameList = this->getGameList(inDay);
+
+            for (const mlbGame& aGame : aGameList)
+            {
+                if (aGame.containsTeam(inTeam))
+                {
+                    ioGames.push_back(aGame);
+                }
+            }
+
+        }
+
         std::vector<mlbGame> getGames(const std::string& inTeam)
         {
-            std::vector<mlbGame> outGames;
+            std::list<mlbGame> aGameList;
 
             boost::gregorian::date aDay = boost::gregorian::day_clock::local_day();
-            aDay -= boost::gregorian::days(2);
+            boost::gregorian::date bDay = aDay;
 
-            while (outGames.size() < 5)
+            while (aGameList.size() < 3)
             {
-                std::list<mlbGame> aGameList = this->getGameList(aDay);
-
-                BOOST_FOREACH(const mlbGame& aGame, aGameList)
-                {
-                    if (aGame.containsTeam(inTeam))
-                    {
-                        outGames.push_back(aGame);
-                    }
-                }
-
-                aDay += boost::gregorian::days(1);
+                getGamesBefore(bDay, inTeam, aGameList);
+                bDay -= boost::gregorian::days(1);
             }
+
+            while (aGameList.size() > 3)
+            {
+                aGameList.pop_front();
+            }
+
+            while (aGameList.size() < 5)
+            {
+                aDay += boost::gregorian::days(1);
+                getGamesAfter(aDay, inTeam, aGameList);
+            }
+
+            while (aGameList.size() > 5)
+            {
+                aGameList.pop_front();
+            }
+
+            std::vector<mlbGame> outGames{ std::make_move_iterator(std::begin(aGameList)),
+                                           std::make_move_iterator(std::end(aGameList)) };
 
             return outGames;
         }

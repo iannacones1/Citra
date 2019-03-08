@@ -1,4 +1,3 @@
-
 #include <mlbClock/Interfaces/iMlbImageBuilder.h>
 
 #include <Module/create_module_macro.h>
@@ -77,7 +76,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             {
                 aText = inGame.finalScore(inTeam);
             }
-            else if (inGame.inProgress())
+            else if (inGame.inProgress() && inGame.status != "Pre-Game")
             {
                 aText = "LIVE";
             }
@@ -116,6 +115,24 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
     void addLinescore(cairo_t* inCairo, const mlbGame& inGame)
     {
+        cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size(inCairo, 18);
+
+        std::stringstream ss;
+
+        if (!inGame.isOver() && inGame.inning && inGame.inning_state)
+        {
+            ss << " " << inGame.inning_state.get() << " " << inGame.inning.get();
+        }
+        else
+        {
+            ss << inGame.status;
+        }
+
+        // Game Status
+        cairo_move_to(inCairo, 10, W/5);
+        cairo_show_text(inCairo, ss.str().c_str());
+
         int X = W/2;
         int Y = H/3 + FONT_HEIGHT;
 
@@ -132,9 +149,6 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         int x = X + SPACEING * 2;
         int y = Y;
-
-        cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-        cairo_set_font_size(inCairo, 18);
 
         for (size_t i = 0; i < aInningCount; i++)
         {
@@ -154,7 +168,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 
         // draw "box" for current inning
-        if (inGame.inning && inGame.inning_state && (inGame.inning_state.get() == "Top" || inGame.inning_state.get() == "Bottom"))
+        if (!inGame.isOver() && inGame.inning && inGame.inning_state && (inGame.inning_state.get() == "Top" || inGame.inning_state.get() == "Bottom"))
         {
             int xLoc = X + SPACEING * 2 + (SPACEING * (inGame.inning.get() - 1) - SPACEING/2);
             int yLoc = (inGame.inning_state.get() == "Top" ? Y : Y + FONT_HEIGHT) + FONT_HEIGHT/2;
@@ -286,6 +300,10 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
     virtual Display::ImageBuffer buildImage(const std::string& inTeam, const std::vector<mlbGame>& inGameList)
     {
         std::cout << __func__ << " " << inTeam << std::endl;
+        for (size_t i = 0; i < inGameList.size(); i++)
+        {
+            std::cout << "inGameList[" << i << "] = " << inGameList.at(i).status << std::endl;
+        }
 
         size_t focalGame = inGameList.size();
         focalGame--;
@@ -322,7 +340,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         cairo_stroke(aCairo); // Drawls all the lines?
 
-        // Game in progress
+        // TODO: only call for Game in progress
         addLinescore(aCairo, cGame);
 
         // Paint home team image image
