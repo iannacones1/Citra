@@ -28,7 +28,8 @@ class EinkDisplayModule : public Interfaces::iBufferDisplay
             if (!aDisplay.initialize())
             {
                 std::cerr << "e-Paper init failed" << std::endl;
-                throw;
+                //throw;
+                return;
             }
 
             aDisplay.display(inBuffer);
