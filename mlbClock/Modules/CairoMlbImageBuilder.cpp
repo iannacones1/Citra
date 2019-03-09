@@ -112,6 +112,77 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         cairo_stroke(inCairo); // Drawls all the lines?
     }
+    void addPreview(cairo_t* inCairo, const mlbGame& inGame)
+    {
+        cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size(inCairo, 18);
+
+        // Game Status
+        cairo_move_to(inCairo, 10, W/5);
+        cairo_show_text(inCairo, inGame.status.c_str());
+
+        int X = W/4;
+        int Y = H/3 + FONT_HEIGHT;
+
+        for (const mlbTeam& aTeam : inGame.teams)
+        {
+            int y = Y;
+
+            { // Team Name
+                cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+                cairo_set_font_size(inCairo, 18);
+
+                std::string name = aTeam.name_abbrev;
+
+                std::cout << name << std::endl;
+
+                cairo_text_extents_t extents;
+                cairo_text_extents(inCairo, name.c_str(), &extents);
+
+                cairo_move_to(inCairo, X, y);
+                cairo_show_text(inCairo, name.c_str());
+
+                y += extents.height;
+            }
+
+            { // Team Record
+                cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+                cairo_set_font_size(inCairo, 14);
+
+                std::string record = aTeam.record();
+
+                std::cout << record << std::endl;
+
+                cairo_text_extents_t extents;
+                cairo_text_extents(inCairo, record.c_str(), &extents);
+
+                cairo_move_to(inCairo, X, y);
+                cairo_show_text(inCairo, record.c_str());
+
+                y += extents.height;
+            }
+
+            { // Pitcher
+                int h = (y - Y);
+                y -= h/2;
+
+                cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+                cairo_set_font_size(inCairo, 18);
+
+                std::string pitcher = (aTeam.probable_pitcher ? aTeam.probable_pitcher.get().winSummary() : "TBD");
+
+                std::cout << pitcher << std::endl;
+
+                cairo_text_extents_t extents;
+                cairo_text_extents(inCairo, pitcher.c_str(), &extents);
+
+                cairo_move_to(inCairo, (X * 3) - extents.width, y - extents.height/2);
+                cairo_show_text(inCairo, pitcher.c_str());
+
+                Y += h + 10;
+            }
+        }
+    }
 
     void addLinescore(cairo_t* inCairo, const mlbGame& inGame)
     {
@@ -340,8 +411,16 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         cairo_stroke(aCairo); // Drawls all the lines?
 
-        // TODO: only call for Game in progress
-        addLinescore(aCairo, cGame);
+        if (cGame.status == "Preview"  ||
+            cGame.status == "Pre-Game" ||
+            cGame.status == "Warmup")
+        {
+            addPreview(aCairo, cGame);
+        }
+        else
+        {
+            addLinescore(aCairo, cGame);
+        }
 
         // Paint home team image image
             std::string aHomeTeamLogo = "../data/MLB/" + cGame.home().name_abbrev + ".png";

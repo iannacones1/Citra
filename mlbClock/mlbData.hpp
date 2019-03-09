@@ -85,7 +85,7 @@ struct mlbTeam
     std::string record() const
     {
         std::stringstream ss;
-        ss << wins << "-" << losses << std::endl;
+        ss << wins << "-" << losses;
         return ss.str();
     }
 
@@ -144,7 +144,6 @@ struct mlbGame
     {
         return time + " " + ampm;
     }
-
 
     std::string teamTime(const std::string& inTeamName) const
     {
