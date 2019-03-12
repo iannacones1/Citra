@@ -122,7 +122,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_show_text(inCairo, inGame.status.c_str());
 
         int X = W/4;
-        int Y = H/3 + FONT_HEIGHT;
+        int Y = H/2 - (FONT_HEIGHT);
 
         for (const mlbTeam& aTeam : inGame.teams)
         {
@@ -386,7 +386,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         if (focalGame == 0 && !inGameList.at(focalGame).inProgress())
         {
-            focalGame = (inGameList.at(2).status == "Preview" ? 1 : 2);
+            focalGame = (inGameList.at(3).status == "Preview" ? 2 : 3);
         }
 
         mlbGame cGame = inGameList.at(focalGame);

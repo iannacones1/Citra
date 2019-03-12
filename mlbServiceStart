@@ -1,4 +1,4 @@
 #! /bin/sh
 
 cd /home/pi/git/Citra/bin
-sudo ./mlbClock
+nohup sudo ./mlbClock&

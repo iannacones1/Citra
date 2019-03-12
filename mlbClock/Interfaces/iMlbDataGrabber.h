@@ -64,26 +64,26 @@ class iMlbDataGrabber
             boost::gregorian::date aDay = boost::gregorian::day_clock::local_day();
             boost::gregorian::date bDay = aDay;
 
-            while (aGameList.size() < 3)
+            while (aGameList.size() < 2)
             {
-                getGamesBefore(bDay, inTeam, aGameList);
                 bDay -= boost::gregorian::days(1);
+                getGamesBefore(bDay, inTeam, aGameList);
             }
 
-            while (aGameList.size() > 3)
+            while (aGameList.size() > 2)
             {
                 aGameList.pop_front();
             }
 
             while (aGameList.size() < 5)
             {
-                aDay += boost::gregorian::days(1);
                 getGamesAfter(aDay, inTeam, aGameList);
+                aDay += boost::gregorian::days(1);
             }
 
             while (aGameList.size() > 5)
             {
-                aGameList.pop_front();
+                aGameList.pop_back();
             }
 
             std::vector<mlbGame> outGames{ std::make_move_iterator(std::begin(aGameList)),

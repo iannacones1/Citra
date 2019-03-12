@@ -42,7 +42,6 @@ sudo cp -r rapidxml-1.13 /usr/include/
  echo "#include \"rapidxml-1.13/rapidxml.hpp\"" > rapidxml
 sudo mv rapidxml /usr/include/
 
-
 - install boost beast
 git clone https://github.com/boostorg/beast.git
 cd beast/
@@ -52,9 +51,10 @@ sudo cp include/boost/beast.hpp /usr/include/boost/
 - clone Citra
  git clone https://github.com/iannacones1/Citra.git
 
+- need to set local time using raspi-config
 
-# I have x11 issues running as root (only on zero, it was a "thin
-" install?)
-xauth list | grep unix`echo $DISPLAY | cut -c10-12` > /tmp/xauth
-sudo su
-xauth add `cat /tmp/xauth`
+- install service
+# https://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html
+sudo cp ~/git/Citra/mlbService /etc/init.d/
+sudo chmod 755 /etc/init.d/mlbService
+sudo update-rc.d mlbService defaults
