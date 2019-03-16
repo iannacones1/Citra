@@ -1,5 +1,7 @@
 #include "mlbDataNames.hpp"
 
+#include <Http/httpClient.h>
+
 #include <Language/Exception.hpp>
 #include <mlbClock/Interfaces/iMlbDataGrabber.h>
 
@@ -246,39 +248,31 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
         XmlDataGrabber() : Interfaces::iMlbDataGrabber() { }
         virtual ~XmlDataGrabber() { }
 
-        static std::string cacheData(int inYear, int inMonth, int inDay)
+        static std::string getTargetName(int inYear, int inMonth, int inDay)
         {
             std::stringstream ss;
-            ss << boost::format("gd2.mlb.com/components/game/mlb/year_%1%/month_%2%/day_%3%/master_scoreboard.xml")
+            ss << boost::format("/components/game/mlb/year_%1%/month_%2%/day_%3%/master_scoreboard.xml")
                   % inYear
                   % boost::io::group(std::setfill('0'), std::setw(2), inMonth)
                   % boost::io::group(std::setfill('0'), std::setw(2), inDay);
 
-            std::string aFileName = ss.str();
-
-            { // TODO: replace with non system call
-                std::string aCmd = "wget -p -q http://";
-                aCmd += aFileName;
-                system(aCmd.c_str());
-            }
-
-            return aFileName;
+            return ss.str();
         }
 
-        virtual std::list<mlbGame> getGameList(const std::string& inFileName)
+        virtual std::list<mlbGame> getGameList(int inYear, int inMonth, int inDay)
         {
-            std::ifstream aFileStream(inFileName);
-            std::vector<char> aFileBuffer((std::istreambuf_iterator<char>(aFileStream)), std::istreambuf_iterator<char>());
-            aFileBuffer.push_back('\0');
+            std::string aTargetName = getTargetName(inYear, inMonth, inDay);
+
+            std::string aFileData = Citra::Http::SynchronousGet("gd2.mlb.com", aTargetName);
 
             rapidxml::xml_document<> aXmlDocument;
-            aXmlDocument.parse<0>(&aFileBuffer[0]);
+            aXmlDocument.parse<0>(&aFileData[0]);
 
             rapidxml::xml_node<>* aRootNode = aXmlDocument.first_node(GAMES);
 
             if (!aRootNode)
             {
-                THROW_RUNTIME_EXCEPTION("FILE ERROR: '" << inFileName << "' missing root tag <" << GAMES << ">");
+                THROW_RUNTIME_EXCEPTION("ERROR: '" << aTargetName << "' missing root tag <" << GAMES << ">");
             }
 
             std::list<mlbGame> results;
@@ -294,13 +288,6 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
             }
 
             return results;
-        }
-
-        virtual std::list<mlbGame> getGameList(int inYear, int inMonth, int inDay)
-        {
-            std::string aFileName = cacheData(inYear, inMonth, inDay);
-
-            return getGameList(aFileName);
         }
 };
 
