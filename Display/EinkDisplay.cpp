@@ -32,6 +32,9 @@ EinkDisplay::~EinkDisplay()
     {
         sleep();
     }
+
+    bcm2835_spi_end();
+    bcm2835_close();
 }
 
 bool EinkDisplay::initialize()
