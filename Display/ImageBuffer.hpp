@@ -3,7 +3,10 @@
 
 #include <vector>
 #include <algorithm>
+
+#include <fstream>
 #include <iostream>
+#include <iterator>
 
 namespace Citra { namespace Display {
 
@@ -29,6 +32,11 @@ class ImageBuffer
     int width() const { return mWidth; }
     int height() const { return mHeight; }
     int length() const { return mData.size(); }
+
+    bool operator!=(const ImageBuffer& inImageBuffer) const
+    {
+        return !(*this == inImageBuffer);
+    }
 
     bool operator==(const ImageBuffer& inImageBuffer) const
     {
@@ -65,10 +73,36 @@ class ImageBuffer
         return mData.at(inLocation);
     }
 
+    void fromFile(const std::string& inFilename)
+    {
+        std::ifstream aFileStream(inFilename.c_str(), std::ifstream::binary);
+
+        std::vector<unsigned char> newData = std::vector<unsigned char>(std::istream_iterator<unsigned char>{aFileStream},
+                                                                        std::istream_iterator<unsigned char>{});
+
+        if (newData.size() == mData.size())
+        {
+            mData = newData;
+        }
+        else
+        {
+            std::cerr << "Bad File: " << inFilename << std::endl;
+        }
+    }
+
+    void toFile(const std::string& inFilename)
+    {
+        std::ofstream aFileStream(inFilename.c_str(), std::ofstream::binary);
+
+        aFileStream.write((char*)&mData[0], mData.size() * sizeof(unsigned char));
+
+        aFileStream.close();
+    }
+
   protected:
     int mWidth;
     int mHeight;
-    std::vector< unsigned char > mData;
+    std::vector<unsigned char> mData;
 };
 
 } /* namespace Display*/ } /* namespace Citra */

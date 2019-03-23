@@ -5,8 +5,12 @@
 
 namespace Citra { namespace mlbClock {
 
+static const std::string DATA_CACHE = "currentImage.bin";
+
 mlbClockComponent::mlbClockComponent()
- : mShutdown(false),
+ : DataGrabber("./lib/XmlDataGrabber.so"),
+   ImageBuilder("./lib/CairoMlbImageBuilder.so"),
+   DisplayModule("./lib/EinkDisplayModule.so"),
    mDataGrabber(DataGrabber),
    mImageBuilder(ImageBuilder),
    mDisplay(DisplayModule)
@@ -14,32 +18,26 @@ mlbClockComponent::mlbClockComponent()
 
 mlbClockComponent::~mlbClockComponent() { }
 
-void mlbClockComponent::shutdown()
+void mlbClockComponent::update()
 {
-    std::cout << __func__ << std::endl;
-    mShutdown = true;
-}
+    std::vector<mlbGame> aGameVector = mDataGrabber->getGames(TEAM);
 
-void mlbClockComponent::run()
-{
-    while (!mShutdown)
+    Citra::Display::ImageBuffer aImgBuf = mImageBuilder->buildImage(TEAM, aGameVector);
+
+    Citra::Display::ImageBuffer bImgBuf(aImgBuf.width(), aImgBuf.height());
+    bImgBuf.fromFile(DATA_CACHE);
+
+    if (aImgBuf != bImgBuf)
     {
-        std::vector<mlbGame> games = mDataGrabber->getGames(TEAM);
-
-        Citra::Display::ImageBuffer aImgBuf = mImageBuilder->buildImage(TEAM, games);
-
         mDisplay->display(aImgBuf);
 
-	bool inProgress = false;
-        for (const mlbGame& aGame : games)
-        {
-            inProgress |= aGame.isUpdating();
-        }
-
-        int durationSec = (inProgress ? 5 : 60);
-        std::cout << (inProgress ? "G" : "No g") << "ame in progress sleep(" << durationSec << ")" << std::endl;
-        sleep(durationSec);
+        aImgBuf.toFile(DATA_CACHE);
     }
+    else
+    {
+        std::cout << "no update" << std::endl;
+    }
+
 }
 
 } /* namespace mlbClock */ } /* namespace Citra */

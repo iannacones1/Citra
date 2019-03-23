@@ -176,6 +176,7 @@ struct mlbGame
     bool inProgress() const
     {
         return status == "In Progress" ||
+               status == "Warmup"      ||
                status == "Delay";
     }
 

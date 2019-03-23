@@ -57,6 +57,25 @@ class IConfigurator
                 }
                 catch(...) { }
             }
+            else if (ioValue != T())
+            {
+                T aLocal;
+                try
+                {
+                    aLocal = boost::lexical_cast<T>(getValue(inClassName, inConfigName));
+                }
+                catch(...) { }
+
+                if (aLocal != T())
+                {
+                    ioValue = aLocal;
+                    std::cout << "Configure Value " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = " << ioValue << std::endl;
+                }
+                else
+                {
+                    std::cout << "DEFAULT Value " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = " << ioValue << std::endl;
+                }
+            }
             else
             {
         	    ioValue = boost::lexical_cast<T>(getValue(inClassName, inConfigName));

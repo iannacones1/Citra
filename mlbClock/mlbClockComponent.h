@@ -17,8 +17,7 @@ class mlbClockComponent
 	    mlbClockComponent();
         virtual ~mlbClockComponent();
 
-        void run();
-        void shutdown();
+        void update();
 
     protected:
         CONFIGURABLE
@@ -31,7 +30,6 @@ class mlbClockComponent
 
         INITIALIZE(mlbClockComponent)
 
-        bool mShutdown;
         Module<Interfaces::iMlbDataGrabber> mDataGrabber;
         Module<Interfaces::iMlbImageBuilder> mImageBuilder;
         Module<Display::Interfaces::iBufferDisplay> mDisplay;

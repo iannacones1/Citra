@@ -26,7 +26,7 @@ $(OBJ_DIR)devMlbClock.o: mlbClock/devMlbClock.cpp
 	mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(QT_INCLUDE) mlbClock/devMlbClock.cpp -o $(OBJ_DIR)devMlbClock.o
 
-$(CLOCK_MODS_DIR)%.so: $(CLOCK_MODS_DIR)%.cpp
+$(CLOCK_MODS_DIR)%.so: $(CLOCK_MODS_DIR)%.cpp $(OBJ_DIR)httpClient.o
 	mkdir -p $(LIB_DIR)
 	$(CC) $(QT_INCLUDE) $(CAIRO_INCLUDE) $(MFLAGS) $(LIB_DIR)$(notdir $@) $< $(OBJ_DIR)httpClient.o -lboost_date_time -lQtGui -lQtCore -lcairo -lboost_system -lpthread
 	
