@@ -5,7 +5,6 @@
 #include <vector>
 #include <sstream>
 
-#include <boost/foreach.hpp>
 #include <boost/optional.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -73,6 +72,12 @@ struct mlbPitcher : public mlbPlayer
 
 };
 
+struct broadcastInfo
+{
+    std::string tv;
+    std::string radio;
+};
+
 struct mlbTeam
 {
     mlbTeam() : TYPE(HOME), team_name(), name_abbrev(), innings(), runs(0), hits(0), errors(0) { }
@@ -104,6 +109,8 @@ struct mlbTeam
     int hits;
     int errors;
     boost::optional<mlbPitcher> probable_pitcher;
+
+    broadcastInfo broadcast;
 };
 
 struct mlbGame
@@ -117,7 +124,7 @@ struct mlbGame
 
     bool containsTeam(const std::string& inTeamName) const
     {
-        BOOST_FOREACH(const mlbTeam& aTeam, teams)
+        for (const mlbTeam& aTeam : teams)
         {
             if (aTeam.isNamed(inTeamName))
             {
@@ -145,17 +152,28 @@ struct mlbGame
         return time + " " + ampm;
     }
 
-    std::string teamTime(const std::string& inTeamName) const
+    const mlbTeam& getTeam(const std::string& inTeamName) const
     {
-        BOOST_FOREACH(const mlbTeam& aTeam, teams)
+        for (const mlbTeam& aTeam : teams)
         {
             if (aTeam.isNamed(inTeamName))
             {
-                return aTeam.time + " " + aTeam.ampm;
+                return aTeam;
             }
         }
 
         throw;
+    }
+
+    std::string teamTime(const std::string& inTeamName) const
+    {
+        const mlbTeam& aTeam = getTeam(inTeamName);
+        return aTeam.time + " " + aTeam.ampm;
+    }
+
+    const broadcastInfo& teamBroadcast(const std::string& inTeamName) const
+    {
+        return getTeam(inTeamName).broadcast;
     }
 
     std::string BSO() const

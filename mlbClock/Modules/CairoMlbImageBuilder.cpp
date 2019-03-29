@@ -28,6 +28,15 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
     virtual ~CairoMlbImageBuilder() { }
 
+    void rightJustify(cairo_t* inCairo, int inX, int inY, const std::string& inText)
+    {
+        cairo_text_extents_t extents;
+        cairo_text_extents(inCairo, inText.c_str(), &extents);
+
+        cairo_move_to(inCairo, inX - extents.width, inY - extents.height/2);
+        cairo_show_text(inCairo, inText.c_str());
+    }
+
     void centerText(cairo_t* inCairo, int inX, int inY, const std::string& inText)
     {
         cairo_text_extents_t extents;
@@ -122,7 +131,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_show_text(inCairo, inGame.status.c_str());
 
         int X = W/4;
-        int Y = H/2 - (FONT_HEIGHT);
+        int Y = H/2;// - (FONT_HEIGHT);
 
         for (const mlbTeam& aTeam : inGame.teams)
         {
@@ -250,7 +259,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
 
         y += FONT_HEIGHT;
 
-        BOOST_FOREACH(const mlbTeam& aTeam, inGame.teams)
+        for (const mlbTeam& aTeam : inGame.teams)
         {
             x = X;
 
@@ -409,6 +418,14 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             addDaySummary(aCairo, (W/5) * i - offset, 0, inGameList.at(i), inTeam, i == focalGame);
         }
 
+        // Game broadcat details
+        cairo_select_font_face(aCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+        cairo_set_font_size(aCairo, 14);
+
+        broadcastInfo aBroadcast = cGame.teamBroadcast(inTeam);
+        rightJustify(aCairo, W - 10, BOX_WIDTH,      aBroadcast.tv);
+        rightJustify(aCairo, W - 10, BOX_WIDTH + 13, aBroadcast.radio);
+
         cairo_stroke(aCairo); // Drawls all the lines?
 
         if (cGame.status == "Preview"  ||
@@ -442,7 +459,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_surface_flush(surface); // flush to ensure all writing to the image was done
         cairo_destroy(aCairo);
 
-        cairo_surface_write_to_png(surface, "test.png");
+        //cairo_surface_write_to_png(surface, "test.png");
         unsigned char* data = cairo_image_surface_get_data(surface);
 
         Citra::Display::ImageBuffer aImgBuf(W, H);

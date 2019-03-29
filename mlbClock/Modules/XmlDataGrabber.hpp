@@ -184,6 +184,29 @@ mlbGame buildGame(rapidxml::xml_node<>* inGameNode)
             assignValue(aGame.pbp, aPBPNode->first_attribute("last"));
         }
 
+        {
+            rapidxml::xml_node<>* aBroadcastNode = inGameNode->first_node("broadcast");
+
+            if (aBroadcastNode)
+            {
+                rapidxml::xml_node<>* aHomeBroadcastNode = aBroadcastNode->first_node(HOME);
+
+                if (aHomeBroadcastNode)
+                {
+                    assignValue(aGame.home().broadcast.tv,    aHomeBroadcastNode->first_node("tv"));
+                    assignValue(aGame.home().broadcast.radio, aHomeBroadcastNode->first_node("radio"));
+                }
+
+                rapidxml::xml_node<>* aAwayBroadcastNode = aBroadcastNode->first_node(AWAY);
+
+                if (aAwayBroadcastNode)
+                {
+                    assignValue(aGame.away().broadcast.tv,    aAwayBroadcastNode->first_node("tv"));
+                    assignValue(aGame.away().broadcast.radio, aAwayBroadcastNode->first_node("radio"));
+                }
+            }
+        }
+
         rapidxml::xml_node<>* aStatusNode = inGameNode->first_node(STATUS);
 
         assignValue(aGame.status, aStatusNode->first_attribute(STATUS));
@@ -210,7 +233,7 @@ mlbGame buildGame(rapidxml::xml_node<>* inGameNode)
 
         if (aLinescoreNode)
         {
-            BOOST_FOREACH(mlbTeam& aTeam, aGame.teams)
+            for (mlbTeam& aTeam : aGame.teams)
             {
                 assignValue(aTeam.runs,   aLinescoreNode->first_node(RUNS)->first_attribute(aTeam.TYPE.c_str()));
                 assignValue(aTeam.hits,   aLinescoreNode->first_node(HITS)->first_attribute(aTeam.TYPE.c_str()));

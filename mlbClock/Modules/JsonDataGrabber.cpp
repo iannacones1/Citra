@@ -133,7 +133,7 @@ mlbGame buildGame(const Json::Value& inData)
     {
         const Json::Value& innings = inData[LINESCORE][INNING];
 
-        BOOST_FOREACH(mlbTeam& aTeam, aGame.teams)
+        for (mlbTeam& aTeam : aGame.teams)
         {
             assignValue(aTeam.team_name,   inData[aTeam.TYPE + TEAM_NAME  ]);
             assignValue(aTeam.name_abbrev, inData[aTeam.TYPE + NAME_ABBREV]);
@@ -146,7 +146,7 @@ mlbGame buildGame(const Json::Value& inData)
 
         for (size_t i = 0; i < innings.size(); i++)
         {
-            BOOST_FOREACH(mlbTeam& aTeam, aGame.teams)
+            for (mlbTeam& aTeam : aGame.teams)
             {
                 assignValue(aTeam.innings.at(i), innings[i][aTeam.TYPE]);
             }

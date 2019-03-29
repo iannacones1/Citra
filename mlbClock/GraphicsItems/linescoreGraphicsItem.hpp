@@ -74,7 +74,7 @@ public:
             inPainter->drawRect(rect);
         }
 
-        BOOST_FOREACH(const mlbTeam& aTeam, mGame.teams)
+        for (const mlbTeam& aTeam : mGame.teams)
         {
             x = 0;
 

@@ -32,7 +32,7 @@ public:
     {
         int y = 0;
 
-        BOOST_FOREACH(const mlbTeam& aTeam, mGame.teams)
+        for (const mlbTeam& aTeam : mGame.teams)
         {
             int x = 0;
             inPainter->setFont(mTeamName);
