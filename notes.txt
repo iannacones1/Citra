@@ -60,4 +60,4 @@ done
 - need to set local time using raspi-config
 
 - add job to /etc/crontab
-sudo sh -c "echo \"*  *    * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /ect/crontab"
+sudo sh -c "echo \"*  *    * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"

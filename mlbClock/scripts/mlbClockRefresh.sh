@@ -39,4 +39,4 @@ fi
 
 cd /home/pi/git/Citra/bin
 
-echo "./mlbClock --mlbClockComponent::TEAM $TEAM"
+./mlbClock --mlbClockComponent::TEAM $TEAM
