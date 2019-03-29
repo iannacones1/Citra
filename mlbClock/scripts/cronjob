@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+    echo "usage:" $0 "TEAM"
+    exit 1;
+fi
+
+TEAM=$1
+
+cd /home/pi/git/Citra/mlbClock/scripts
+
+flock -n .lock -c "./mlbClockRefresh.sh $TEAM"

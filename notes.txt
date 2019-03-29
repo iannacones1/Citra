@@ -59,8 +59,5 @@ done
 
 - need to set local time using raspi-config
 
-- install service
-# https://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html
-sudo cp ~/git/Citra/mlbService /etc/init.d/
-sudo chmod 755 /etc/init.d/mlbService
-sudo update-rc.d mlbService defaults
+- add job to /etc/crontab
+sudo sh -c "echo \"*  *    * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /ect/crontab"
