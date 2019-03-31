@@ -33,7 +33,7 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_text_extents_t extents;
         cairo_text_extents(inCairo, inText.c_str(), &extents);
 
-        cairo_move_to(inCairo, inX - extents.width, inY - extents.height/2);
+        cairo_move_to(inCairo, inX - extents.width, inY);
         cairo_show_text(inCairo, inText.c_str());
     }
 
@@ -126,12 +126,8 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
         cairo_set_font_size(inCairo, 18);
 
-        // Game Status
-        cairo_move_to(inCairo, 10, W/5);
-        cairo_show_text(inCairo, inGame.status.c_str());
-
         int X = W/4;
-        int Y = H/2;// - (FONT_HEIGHT);
+        int Y = H/2;
 
         for (const mlbTeam& aTeam : inGame.teams)
         {
@@ -198,23 +194,8 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         cairo_select_font_face(inCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
         cairo_set_font_size(inCairo, 18);
 
-        std::stringstream ss;
-
-        if (!inGame.isOver() && inGame.inning && inGame.inning_state)
-        {
-            ss << " " << inGame.inning_state.get() << " " << inGame.inning.get();
-        }
-        else
-        {
-            ss << inGame.status;
-        }
-
-        // Game Status
-        cairo_move_to(inCairo, 10, W/5);
-        cairo_show_text(inCairo, ss.str().c_str());
-
         int X = W/2;
-        int Y = H/3 + FONT_HEIGHT;
+        int Y = H/3 + (FONT_HEIGHT * 1.5);
 
         size_t aInningCount = std::max(inGame.away().innings.size(), (size_t)9);
 
@@ -418,13 +399,32 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
             addDaySummary(aCairo, (W/5) * i - offset, 0, inGameList.at(i), inTeam, i == focalGame);
         }
 
+        { // Game Status
+            cairo_select_font_face(aCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+            cairo_set_font_size(aCairo, 18);
+
+            std::stringstream ss;
+
+            if (!cGame.isOver() && cGame.inning && cGame.inning_state)
+            {
+                ss << " " << cGame.inning_state.get() << " " << cGame.inning.get();
+            }
+            else
+            {
+                ss << cGame.status;
+            }
+
+
+            cairo_move_to(aCairo, 10, W/5);
+            cairo_show_text(aCairo, ss.str().c_str());
+        }
+
         // Game broadcat details
         cairo_select_font_face(aCairo, "lato", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
         cairo_set_font_size(aCairo, 14);
 
         broadcastInfo aBroadcast = cGame.teamBroadcast(inTeam);
-        rightJustify(aCairo, W - 10, BOX_WIDTH,      aBroadcast.tv);
-        rightJustify(aCairo, W - 10, BOX_WIDTH + 13, aBroadcast.radio);
+        rightJustify(aCairo, W - 10, BOX_WIDTH, aBroadcast.tv);
 
         cairo_stroke(aCairo); // Drawls all the lines?
 
