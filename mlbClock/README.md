@@ -1,6 +1,6 @@
 # MLB Clock
 
-![](Example.png "Screen Example")
+![](Preview.png "Screen Example")
 
 ## Raspberry Pi Raspbian Install/Setup Guide
 
