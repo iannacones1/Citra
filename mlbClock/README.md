@@ -19,6 +19,7 @@ Things to update
  * Setup WiFi `2 Network Options` > `N2 Wi-fi`
  * Set Local Time `4 Localisation Options` > `I2 Cange Timezone` 
  * enable i2c `5 Interface Options` > `P5 I2C`
+ * enable ssh (optional)
 
 ## Install boost
     sudo apt-get install libboost-all-dev
@@ -42,8 +43,7 @@ Things to update
     wget https://downloads.sourceforge.net/project/rapidxml/rapidxml/rapidxml%201.13/rapidxml-1.13.zip
     unzip rapidxml-1.13.zip
     sudo cp -r rapidxml-1.13 /usr/include/
-    echo "#include \"rapidxml-1.13/rapidxml.hpp\"" > rapidxml
-    sudo mv rapidxml /usr/include/
+    sudo sh -c "echo '#include \"rapidxml-1.13/rapidxml.hpp\"' > /usr/include/rapidxml"
 
 ## Install boost beast (and supporting boost header only libs)
     cd ~/git; \
@@ -70,14 +70,14 @@ Things to update
     git clone https://github.com/iannacones1/Citra.git
 
 ## Build mlbClock
+    cd /home/pi/git/Citra/
     make mlbClock
     make Display/Modules/EinkDisplayModule.so
 
 ## Add job to /etc/crontab
-If you felt so inclined you could replace `PHI` with the team of your choice
-but why would you do that? go Phils!
+If you felt so inclined you could replace `PHI` with the team of your choice. But why would you do that? go Phils!
 
-    sudo sh -c "echo \"*  *    * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"
+    sudo sh -c "echo \"*/3  *  * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"
 
 
 ## NOTES

@@ -59,7 +59,7 @@ class IConfigurator
             }
             else if (ioValue != T())
             {
-                T aLocal;
+                T aLocal = T();
                 try
                 {
                     aLocal = boost::lexical_cast<T>(getValue(inClassName, inConfigName));

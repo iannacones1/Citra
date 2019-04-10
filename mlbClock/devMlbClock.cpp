@@ -12,16 +12,17 @@ int main(int argc, char* argv[])
     std::cout << "Running " << argv[0] << std::endl;
 
     std::string aTeam = "PHI";
+    std::string aDataGrabber = "./lib/XmlDataGrabber.so";
+    std::string aImageBuilder = "./lib/CairoMlbImageBuilder.so";
 
-    if (argc > 1)
-    {
-        aTeam = std::string(argv[1]);
-    }
+    if (argc > 1) { aTeam        = std::string(argv[1]); }
+    if (argc > 2) { aDataGrabber = std::string(argv[2]); }
+    if (argc > 3) { aDataGrabber = std::string(argv[3]); }
 
     QApplication app(argc, argv);
 
-    Citra::Module<Citra::mlbClock::Interfaces::iMlbDataGrabber> mDataGrabber("./lib/XmlDataGrabber.so");
-    Citra::Module<Citra::mlbClock::Interfaces::iMlbImageBuilder> mImageBuilder("./lib/CairoMlbImageBuilder.so");
+    Citra::Module<Citra::mlbClock::Interfaces::iMlbDataGrabber> mDataGrabber(aDataGrabber);
+    Citra::Module<Citra::mlbClock::Interfaces::iMlbImageBuilder> mImageBuilder(aImageBuilder);
 
     std::vector<Citra::mlbClock::mlbGame> games = mDataGrabber->getGames(aTeam);
 

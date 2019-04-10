@@ -8,7 +8,7 @@ namespace Citra { namespace mlbClock {
 static const std::string DATA_CACHE = "currentImage.bin";
 
 mlbClockComponent::mlbClockComponent()
- : DataGrabber("./lib/XmlDataGrabber.so"),
+ : DataGrabber("./lib/XmlDataGrabber.so"), // DEFAULT
    ImageBuilder("./lib/CairoMlbImageBuilder.so"),
    DisplayModule("./lib/EinkDisplayModule.so"),
    mDataGrabber(DataGrabber),
@@ -32,10 +32,6 @@ void mlbClockComponent::update()
         mDisplay->display(aImgBuf);
 
         aImgBuf.toFile(DATA_CACHE);
-    }
-    else
-    {
-        std::cout << "no update" << std::endl;
     }
 
 }

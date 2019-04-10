@@ -1,10 +1,9 @@
-CLOCK_MODS_DIR := mlbClock/Modules/
 MLB_CLOCK_OBJS := $(OBJ_DIR)mlbClock.o $(OBJ_DIR)mlbClockComponent.o
 DEV_CLOCK_OBJS := $(OBJ_DIR)devMlbClock.o 
-MLB_CLOCK_MODS := $(patsubst %.cpp, %.so, $(wildcard $(CLOCK_MODS_DIR)*.cpp))
 
 QT_INCLUDE := -I/usr/include/qt4/
-CAIRO_INCLUDE := -I/usr/include/cairo/ -I/usr/include/cairomm-1.0/
+
+include mlbClock/Modules/Makefile
 
 mlbClock: $(CONFIGURABLE_OBJS) $(MLB_CLOCK_OBJS) $(MLB_CLOCK_MODS)
 	mkdir -p $(BIN_DIR)	
@@ -26,8 +25,4 @@ $(OBJ_DIR)devMlbClock.o: mlbClock/devMlbClock.cpp
 	mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(QT_INCLUDE) mlbClock/devMlbClock.cpp -o $(OBJ_DIR)devMlbClock.o
 
-$(CLOCK_MODS_DIR)%.so: $(CLOCK_MODS_DIR)%.cpp $(OBJ_DIR)httpClient.o
-	mkdir -p $(LIB_DIR)
-	$(CC) $(QT_INCLUDE) $(CAIRO_INCLUDE) $(MFLAGS) $(LIB_DIR)$(notdir $@) $< $(OBJ_DIR)httpClient.o -lboost_date_time -lQtGui -lQtCore -lcairo -lboost_system -lpthread
-	
-ALL += mlbClock $(MLB_CLOCK_OBJS) $(MLB_CLOCK_MODS) devMlbClock $(DEV_CLOCK_OBJS)
+ALL += mlbClock $(MLB_CLOCK_OBJS) devMlbClock $(DEV_CLOCK_OBJS)

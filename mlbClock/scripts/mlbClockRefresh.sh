@@ -30,7 +30,7 @@ if [ "$DATE" == "0300" ]; then
         make clean
 	
         make mlbClock
-	make Display/Modules/EinkDisplayModule.so
+        make Display/Modules/EinkDisplayModule.so
     else
 	echo $PULL
     fi
