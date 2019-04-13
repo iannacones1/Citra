@@ -12,7 +12,7 @@ CFLAGS = $(FLAGS) -c
 LFLAGS = $(FLAGS)
 MFLAGS = $(FLAGS) -fPIC -shared -o
 
-ALL =  
+ALL =
 
 include Display/Makefile
 include Language/Makefile

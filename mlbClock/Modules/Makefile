@@ -18,15 +18,14 @@ $(LIB_DIR)JsonDataGrabber.so: mlbClock/Modules/JsonDataGrabber.cpp
 
 # If cairo include dir is missing then don't add target to MLB_CLOCK_MODS
 ifeq ($(shell [ -d /usr/include/cairo/ ] && echo "FOUND"),FOUND)
-	MLB_CLOCK_MODS += $(LIB_DIR)CairoMlbImageBuilder.so
+MLB_CLOCK_MODS += $(LIB_DIR)CairoMlbImageBuilder.so
 else
     $(info ommiting CairoMlbImageBuilder from MLB_CLOCK_MODS)
 endif
 
 # If qt4 include dir is missing then don't add target to MLB_CLOCK_MODS
-qt_dir = $(shell [ -d /usr/include/qt4/ ] && echo "FOUND")
-ifeq ($(qt_dir),FOUND)
-	MLB_CLOCK_MODS += $(LIB_DIR)QtMlbImageBuilder.so
+ifeq ($(shell [ -d /usr/include/qt4/ ] && echo "FOUND"),FOUND)
+MLB_CLOCK_MODS += $(LIB_DIR)QtMlbImageBuilder.so
 else
     $(info ommiting QtMlbImageBuilder from MLB_CLOCK_MODS)
 endif

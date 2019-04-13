@@ -10,7 +10,7 @@ TEAM=$1
 
 DATE=`date +%H%M`
 
-# At 03:00 am try and 
+# At 03:00 am try and pull updates
 if [ "$DATE" == "0300" ]; then
 
     echo "Looking for update..."
@@ -26,9 +26,9 @@ if [ "$DATE" == "0300" ]; then
     fi
 
     if [ "$PULL" != "Already up-to-date." ]; then
-        echo "Building.."
+        echo "Building..."
         make clean
-	
+
         make mlbClock
         make Display/Modules/EinkDisplayModule.so
     else
@@ -39,4 +39,4 @@ fi
 
 cd /home/pi/git/Citra/bin
 
-./mlbClock --mlbClockComponent::TEAM $TEAM
+sudo ./mlbClock --mlbClockComponent::TEAM $TEAM

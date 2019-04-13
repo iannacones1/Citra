@@ -77,7 +77,7 @@ Things to update
 ## Add job to /etc/crontab
 If you felt so inclined you could replace `PHI` with the team of your choice. But why would you do that? go Phils!
 
-    sudo sh -c "echo \"*/3  *  * * *   root    /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"
+    sudo sh -c "echo \"*/3  *  * * *   pi      /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"
 
 
 ## NOTES
