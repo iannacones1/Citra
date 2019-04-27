@@ -12,6 +12,25 @@ Most of my projects utilize Raspberry Pi and Raspbian
 
 [Installing operating system](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
 
+### Setup Raspbian headless
+
+To setup wifi headless make a file `/boot/wpa_supplicant.conf` on the SD card. Content as follows:
+
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+            ssid="«your_SSID»"
+            psk="«your_PSK»"
+    }
+
+If you don't wish to store your wifi password in plain text, use `wpa_passphrase` to generate the hash
+
+
+To setup SSH headless make a file `/boot/ssh` on the SD card. Content of the file doesn't matter.
+
+
 ## Hardware Links
 
 Some of the hardware this library supports
