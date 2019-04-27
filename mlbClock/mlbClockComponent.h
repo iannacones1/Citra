@@ -25,7 +25,8 @@ class mlbClockComponent
             (std::string) DataGrabber,
             (std::string) ImageBuilder,
             (std::string) DisplayModule,
-            (std::string) TEAM
+            (std::string) TEAM,
+            (bool)        ForceUpdate
         )
 
         INITIALIZE(mlbClockComponent)

@@ -14,7 +14,7 @@ CommandLineConfigurator::~CommandLineConfigurator() { }
 
 void CommandLineConfigurator::addData(int argc, char* argv[])
 {
-    std::cout << __func__ << std::endl;
+    std::cout << "Selected Configurations:" << std::endl;
 	if (!argc % 2)
 	{
 		std::cerr << "bad num " << argc << " " << argc % 2 << std::endl;
@@ -23,14 +23,30 @@ void CommandLineConfigurator::addData(int argc, char* argv[])
 
 	for (int i = 1; i + 1 < argc; i += 2)
 	{
-		std::cout << std::string(argv[i]) << " = " << std::string(argv[i + 1]) << std::endl;
+		std::cout << "  " << std::string(argv[i]) << " = " << std::string(argv[i + 1]) << std::endl;
 		mConfigurations.push_back(Configuration(argv[i], argv[i + 1]));
 	}
 }
 
-void CommandLineConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
+void CommandLineConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType, const std::string& inDefaultValue)
 {
-    std::cout << " OPTION: --" << inClassName << "::" << inConfigName << " '" << inType << "'" << std::endl;
+    static bool first = true;
+
+    if (first)
+    {
+        std::cout << "Configuration Options:" << std::endl;
+        first = false;
+    }
+
+    bool init = isInitialised(inDefaultValue);
+    std::cout << "  " << (init ? "OPTIONAL" : "REQUIRED");
+    std::cout << " --" << inClassName << "::" << inConfigName;
+    std::cout << " [" << inType;
+    if (init)
+    {
+        std::cout << " = " << inDefaultValue;
+    }
+    std::cout << "]" << std::endl;
 }
 
 std::string CommandLineConfigurator::getValue(const std::string& inClassName, const std::string& inConfigName)

@@ -41,7 +41,7 @@ void FileConfigurator::addFileData(const std::string& inConfigFile)
     }
 }
 
-void FileConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
+void FileConfigurator::help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType, const std::string& inDefaultValue)
 {
     std::cout << " OPTION: " << inClassName << " " << inConfigName << " '" << inType << "'" << std::endl;
 }

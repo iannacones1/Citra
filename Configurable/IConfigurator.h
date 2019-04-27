@@ -7,9 +7,8 @@
 #include <fstream>
 #include <iostream>
 
-#include <boost/lexical_cast.hpp>
-#include <cxxabi.h>
 #include <Language/Demangler.hpp>
+#include <Language/Lexical.hpp>
 
 namespace Citra { namespace Configurable {
 
@@ -26,10 +25,10 @@ class IConfigurator
         {
             if (mHelp)
             {
-                help(inClassName, inConfigName, Language::Demangler::demangle(ioValue));
+                help(inClassName, inConfigName, Language::Demangler::demangle(ioValue), "");
                 for (const std::string& aValue : getValues(inClassName, inConfigName))
                 {
-                    ioValue.push_back(boost::lexical_cast<T>(aValue));
+                    ioValue.push_back(Language::Lexical::fromString<T>(aValue));
                 }
             }
             else
@@ -38,7 +37,7 @@ class IConfigurator
                 for (const std::string& aValue : getValues(inClassName, inConfigName))
                 {
                     std::cout << aValue << " ";
-                    ioValue.push_back(boost::lexical_cast<T>(aValue));
+                    ioValue.push_back(Language::Lexical::fromString<T>(aValue));
                 }
                 std::cout << std::endl;
             }
@@ -49,49 +48,59 @@ class IConfigurator
         {
             if (mHelp)
             {
-                help(inClassName, inConfigName, Language::Demangler::demangle(ioValue));
+                help(inClassName, inConfigName, Language::Demangler::demangle(ioValue), Language::Lexical::toString(ioValue));
 
                 try
                 {
-                    ioValue = boost::lexical_cast<T>(getValue(inClassName, inConfigName));
+                    ioValue = Language::Lexical::fromString<T>(getValue(inClassName, inConfigName));
                 }
                 catch(...) { }
+
+                return;
             }
-            else if (ioValue != T())
+            else if (isInitialised(ioValue))
             {
                 T aLocal = T();
                 try
                 {
-                    aLocal = boost::lexical_cast<T>(getValue(inClassName, inConfigName));
+                    aLocal = Language::Lexical::fromString<T>(getValue(inClassName, inConfigName));
                 }
                 catch(...) { }
 
-                if (aLocal != T())
+                if (isInitialised(aLocal))
                 {
                     ioValue = aLocal;
-                    std::cout << "Configure Value " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = " << ioValue << std::endl;
-                }
-                else
-                {
-                    std::cout << "DEFAULT Value " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = " << ioValue << std::endl;
                 }
             }
             else
             {
-        	    ioValue = boost::lexical_cast<T>(getValue(inClassName, inConfigName));
-        	    std::cout << "Configure Value " << Language::Demangler::demangle(ioValue) << " " << inClassName << "::" << inConfigName << " = " << ioValue << std::endl;
+        	    ioValue = Language::Lexical::fromString<T>(getValue(inClassName, inConfigName));
             }
 
+            std::cout << " " << inClassName << "::" << inConfigName << " [" << Language::Demangler::demangle(ioValue) << " = " << ioValue << "]" << std::endl;
         }
 
 
     protected:
+        template<typename T>
+        static bool isInitialised(const T& aValue)
+        {
+            return aValue != T();
+        }
+
 	    virtual std::string getValue(const std::string& inClassName, const std::string& inConfigName) = 0;
 	    virtual std::list<std::string> getValues(const std::string& inClassName, const std::string& inConfigName) = 0;
 
-	    virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType)
+	    virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType, const std::string& inDefaultValue)
 	    {
-            std::cout << "HELP Configure " << inType << " " << inClassName << "::" << inConfigName << std::endl;
+            std::cout << "HELP Configure " << inType << " " << inClassName << "::" << inConfigName;
+
+            if (isInitialised(inDefaultValue))
+            {
+                std::cout << " = " << inDefaultValue;
+            }
+
+            std::cout << std::endl;
 	    }
 
 	    IConfigurator(int argc, char* argv[]);
@@ -101,6 +110,13 @@ class IConfigurator
     private:
         bool mHelp;
 };
+
+// consider all booleans initialised, because default construction is valid
+template <>
+inline bool IConfigurator::isInitialised<bool>(const bool&)
+{
+    return true;
+}
 
 } /* namespace Configurable*/ } /* namespace Citra */
 

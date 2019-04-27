@@ -15,7 +15,7 @@ class EinkDisplay
     virtual ~EinkDisplay();
 
     bool initialize();
-    void display(const ImageBuffer& inImageBuffer);
+    void display(const ImageBuffer& inImageBuffer, bool inInvert = false);
 
     void set(unsigned char inChar, int inNum = WIDTH * HEIGHT / 2);
   protected:

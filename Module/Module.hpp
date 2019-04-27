@@ -22,32 +22,36 @@ class Module
         {
             if (inLib.empty()) { return; }
 
-            char* err;
+            auto libClose = [](void* inHandle) { if (inHandle) dlclose(inHandle); };
 
 	        // http://www.linuxjournal.com/article/3687
 	        // http://www.dwheeler.com/program-library/Program-Library-HOWTO/x172.html
-	        mHandle.reset(dlopen(inLib.c_str(), RTLD_NOW), dlclose);
+	        mHandle.reset(dlopen(inLib.c_str(), RTLD_NOW), libClose);
 
-            err = dlerror();
-            if (!mHandle)
+	        char* err = dlerror();
+
+            if (mHandle)
 	        {
+                I* (*mkr)();
+                mkr = (I* (*)())dlsym(mHandle.get(), "create_module");
+
+                err = dlerror();
+
+                if (mkr && err == NULL)
+                {
+                    I* newptr = (mkr)();
+
+                    mPtr.reset(newptr);
+                }
+                else
+                {
+                    std::cerr << "Issue during dlsym(" << inLib << ") ERROR: " << err << std::endl;
+                }
+	        }
+            else
+            {
                 std::cerr << "Issue during dlopen(" << inLib << ") ERROR: " << err << std::endl;
-                throw;
-	        }
-
-            I* (*mkr)();
-            mkr = (I* (*)())dlsym(mHandle.get(), "create_module");
-
-            err = dlerror();
-	        if (!mkr || err != NULL)
-	        {
-	            std::cerr << "Issue during dlsym(" << inLib << ") ERROR: " << err << std::endl;
-                throw;
-	        }
-
-            I* newptr = (mkr)();
-
-            mPtr.reset(newptr);
+            }
         }
 
         virtual ~Module() { }

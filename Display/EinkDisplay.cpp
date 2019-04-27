@@ -107,26 +107,27 @@ bool EinkDisplay::initialize()
     return true;
 }
 
-void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer)
+void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer, bool inInvert /* = false */)
 {
     sendCommand(DATA_START_TRANSMISSION_1);
 
     for (int i = 0; i < inImageBuffer.length(); i += 2)
     {
-        bool invert = true;
         unsigned char d = 0x00;
 
-        if (invert)
+        if (inInvert)
         {
-            if (inImageBuffer.at(i) == 0x00)
-            {
-                d |= 0x30;
-            }
-
-            if (inImageBuffer.at(i+1) == 0x00)
-            {
-                d |= 0x03;
-            }
+//            if (inImageBuffer.at(i) == 0x00)
+//            {
+//                d |= 0x30;
+//            }
+//
+//            if (inImageBuffer.at(i+1) == 0x00)
+//            {
+//                d |= 0x03;
+//            }
+            d |= 0x30 ^ inImageBuffer.at(i);
+            d |= 0x03 ^ inImageBuffer.at(i+1);
         }
         else
         {

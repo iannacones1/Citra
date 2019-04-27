@@ -8,6 +8,10 @@ $(LIB_DIR)QtMlbImageBuilder.so: mlbClock/Modules/QtMlbImageBuilder.cpp
 	mkdir -p $(LIB_DIR)
 	$(CC) $(QT_INCLUDE) $(MFLAGS) $(LIB_DIR)QtMlbImageBuilder.so mlbClock/Modules/QtMlbImageBuilder.cpp -lQtGui -lQtCore -lpthread
 
+$(LIB_DIR)TestDisplayModule.so: mlbClock/Modules/TestDisplayModule.cpp
+	mkdir -p $(LIB_DIR)
+	$(CC) $(QT_INCLUDE) $(MFLAGS) $(LIB_DIR)TestDisplayModule.so mlbClock/Modules/TestDisplayModule.cpp -lQtGui -lQtCore -lpthread
+
 $(LIB_DIR)XmlDataGrabber.so: mlbClock/Modules/XmlDataGrabber.cpp $(OBJ_DIR)httpClient.o
 	mkdir -p $(LIB_DIR)
 	$(CC) $(MFLAGS) $(LIB_DIR)XmlDataGrabber.so mlbClock/Modules/XmlDataGrabber.cpp $(OBJ_DIR)httpClient.o -lboost_date_time -lboost_system
@@ -26,6 +30,7 @@ endif
 # If qt4 include dir is missing then don't add target to MLB_CLOCK_MODS
 ifeq ($(shell [ -d /usr/include/qt4/ ] && echo "FOUND"),FOUND)
 MLB_CLOCK_MODS += $(LIB_DIR)QtMlbImageBuilder.so
+MLB_CLOCK_MODS += $(LIB_DIR)TestDisplayModule.so
 else
     $(info ommiting QtMlbImageBuilder from MLB_CLOCK_MODS)
 endif

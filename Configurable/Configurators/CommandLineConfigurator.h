@@ -13,7 +13,7 @@ class CommandLineConfigurator : public IConfigurator
         CommandLineConfigurator(int argc, char* argv[]);
         virtual ~CommandLineConfigurator();
 
-        virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType);
+        virtual void help(const std::string& inClassName, const std::string& inConfigName, const std::string& inType, const std::string& inDefaultValue) override;
 
     protected:
         struct Configuration

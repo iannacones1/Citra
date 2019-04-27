@@ -5,6 +5,8 @@
 #include <Display/Interfaces/iBufferDisplay.h>
 #include <Display/EinkDisplay.h>
 
+#include <Configurable/Configurable.hpp>
+
 namespace Citra { namespace Display {
 
 class EinkDisplayModule : public Interfaces::iBufferDisplay
@@ -12,6 +14,7 @@ class EinkDisplayModule : public Interfaces::iBufferDisplay
     public:
         EinkDisplayModule()
          : Interfaces::iBufferDisplay(),
+           INVERT(false),
            mCurrentBuffer(EinkDisplay::WIDTH, EinkDisplay::HEIGHT, 0x33)
         { }
 
@@ -33,10 +36,18 @@ class EinkDisplayModule : public Interfaces::iBufferDisplay
                 throw;
             }
 
-            aDisplay.display(inBuffer);
+            aDisplay.display(inBuffer, INVERT);
 
             mCurrentBuffer = inBuffer;
         }
+
+    protected:
+        CONFIGURABLE
+        (
+            (bool) INVERT
+        )
+
+        INITIALIZE(EinkDisplayModule)
 
         Citra::Display::ImageBuffer mCurrentBuffer;
 };

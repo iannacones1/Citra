@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./mlbClock --mlbClockComponent::DisplayModule ./lib/TestDisplayModule.so --mlbClockComponent::ForceUpdate true "$@"

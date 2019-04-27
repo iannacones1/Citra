@@ -11,6 +11,7 @@ mlbClockComponent::mlbClockComponent()
  : DataGrabber("./lib/XmlDataGrabber.so"), // DEFAULT
    ImageBuilder("./lib/CairoMlbImageBuilder.so"),
    DisplayModule("./lib/EinkDisplayModule.so"),
+   ForceUpdate(false),
    mDataGrabber(DataGrabber),
    mImageBuilder(ImageBuilder),
    mDisplay(DisplayModule)
@@ -27,7 +28,7 @@ void mlbClockComponent::update()
     Citra::Display::ImageBuffer bImgBuf(aImgBuf.width(), aImgBuf.height());
     bImgBuf.fromFile(DATA_CACHE);
 
-    if (aImgBuf != bImgBuf)
+    if (aImgBuf != bImgBuf || ForceUpdate)
     {
         mDisplay->display(aImgBuf);
 
