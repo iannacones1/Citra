@@ -21,6 +21,15 @@ Things to update
  * enable i2c `5 Interface Options` > `P5 I2C`
  * enable ssh (optional)
 
+## install git
+    sudo apt-get install git
+
+## Clone Citra
+    cd /home/pi/
+    mkdir git
+    cd git
+    git clone https://github.com/iannacones1/Citra.git
+
 ## Install boost
     sudo apt-get install libboost-all-dev
 
@@ -63,12 +72,6 @@ Things to update
 ## install jsoncpp (optional)
     sudo apt-get install libjsoncpp-dev
 
-## Clone Citra
-    cd /home/pi/
-    mkdir git
-    cd git
-    git clone https://github.com/iannacones1/Citra.git
-
 ## Build mlbClock
     cd /home/pi/git/Citra/
     make mlbClock
@@ -80,10 +83,3 @@ If you felt so inclined you could replace `PHI` with the team of your choice. Bu
     sudo sh -c "echo \"*/3  *  * * *   pi      /home/pi/git/Citra/mlbClock/scripts/cronjob PHI\" >> /etc/crontab"
 
 
-## NOTES
-I had an issue with things not installing that being said, things still seemed to work, just keeping as notes
-
-    sudo apt-get remove openjdk-8-jre-headless openjdk-8-jre
-    sudo apt-get install ca-certificates-java
-    sudo apt-get install openjdk-8-jre-headless
-    sudo apt-get install openjdk-8-jre # Optional, enables Java GUI apps

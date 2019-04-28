@@ -36,6 +36,15 @@ else
 endif
 
 MLB_CLOCK_MODS += $(LIB_DIR)XmlDataGrabber.so
+
+
+ifeq ($(shell [ -d /usr/include/jsoncpp/ ] && echo "FOUND"),FOUND)
 MLB_CLOCK_MODS += $(LIB_DIR)JsonDataGrabber.so
+else
+    $(info ommiting JsonDataGrabber from MLB_CLOCK_MODS)
+endif
+
+
+
 
 ALL += $(MLB_CLOCK_MODS)

@@ -115,17 +115,8 @@ void EinkDisplay::display(const Citra::Display::ImageBuffer& inImageBuffer, bool
     {
         unsigned char d = 0x00;
 
-        if (inInvert)
+        if (!inInvert)
         {
-//            if (inImageBuffer.at(i) == 0x00)
-//            {
-//                d |= 0x30;
-//            }
-//
-//            if (inImageBuffer.at(i+1) == 0x00)
-//            {
-//                d |= 0x03;
-//            }
             d |= 0x30 ^ inImageBuffer.at(i);
             d |= 0x03 ^ inImageBuffer.at(i+1);
         }
