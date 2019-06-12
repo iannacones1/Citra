@@ -39,4 +39,14 @@ fi
 
 cd /home/pi/git/Citra/bin
 
-sudo ./mlbClock --mlbClockComponent::TEAM $TEAM
+
+LAST_MOD=`stat -c %Y currentImage.bin`
+CUR_TIME=`date +%s`
+
+DUR=$((CUR_TIME - LAST_MOD))
+
+# only run if the file currentImage.bin hasn't been modified in 3 minutes
+#  this insures that the screen wont be refreshed too often
+if [ $DUR -gt 180 ]; then
+    sudo ./mlbClock --mlbClockComponent::TEAM $TEAM
+fi
