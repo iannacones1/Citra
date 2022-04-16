@@ -369,15 +369,15 @@ class CairoMlbImageBuilder : public Interfaces::iMlbImageBuilder
         size_t focalGame = inGameList.size();
         focalGame--;
 
-        while (focalGame > 0 && !inGameList.at(focalGame).inProgress())
-        {
-            focalGame--;
-        }
+        //while (focalGame > 0 && !inGameList.at(focalGame).inProgress())
+        //{
+        //    focalGame--;
+        //}
 
-        if (focalGame == 0 && !inGameList.at(focalGame).inProgress())
-        {
-            focalGame = (inGameList.at(3).status == "Preview" ? 2 : 3);
-        }
+        //if (focalGame == 0 && !inGameList.at(focalGame).inProgress())
+        //{
+        //    focalGame = (inGameList.at(3).status == "Preview" ? 2 : 3);
+        //}
 
         mlbGame cGame = inGameList.at(focalGame);
 

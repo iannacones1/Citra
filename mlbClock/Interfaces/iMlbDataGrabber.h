@@ -63,13 +63,14 @@ class iMlbDataGrabber
 
             boost::gregorian::date aDay = boost::gregorian::day_clock::local_day();
             boost::gregorian::date bDay = aDay;
+            aDay += boost::gregorian::days(2);
 
-            while (aGameList.size() < 2)
+            while (aGameList.size() < 5)
             {
-                bDay -= boost::gregorian::days(1);
                 getGamesBefore(bDay, inTeam, aGameList);
+                bDay -= boost::gregorian::days(1);
             }
-
+/*
             while (aGameList.size() > 2)
             {
                 aGameList.pop_front();
@@ -80,6 +81,7 @@ class iMlbDataGrabber
                 getGamesAfter(aDay, inTeam, aGameList);
                 aDay += boost::gregorian::days(1);
             }
+*/
 
             while (aGameList.size() > 5)
             {

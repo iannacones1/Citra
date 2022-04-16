@@ -295,7 +295,9 @@ class XmlDataGrabber : public Interfaces::iMlbDataGrabber
 
             if (!aRootNode)
             {
-                THROW_RUNTIME_EXCEPTION("ERROR: '" << aTargetName << "' missing root tag <" << GAMES << ">");
+                //THROW_RUNTIME_EXCEPTION("ERROR: '" << aTargetName << "' missing root tag <" << GAMES << ">");
+                std::cerr << "ERROR: '" << aTargetName << "' missing root tag <" << GAMES << ">" << std::endl;
+                return std::list<mlbGame>();
             }
 
             std::list<mlbGame> results;
